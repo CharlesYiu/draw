@@ -1,6 +1,5 @@
 // TODO Implement the ability to change shapes when using the shape tool
 // TODO Implement the ability to hold to add/minus the thickness repeatedly
-// TODO Implement the ability to change colors and opacity
 // TODO Implement a custom cursor
 // TODO Implement undo and redo actions
 // TODO Make settings save to local storage when modified
@@ -30,7 +29,7 @@ window.onload = () => {
     previewCanvas.onmousedown = function() {
         cursorDown = true
         settings.style.opacity = "0.25"
-        Tools.getCurrentTool().start(window.event)
+        Tools.currentTool.start(window.event)
     }
     window.onmouseup = function() {
         if (cursorDown) {
@@ -38,12 +37,12 @@ window.onload = () => {
             if (!transparentSettings) {
                 settings.style.opacity = "1"
             }
-            Tools.getCurrentTool().stop(window.event)
+            Tools.currentTool.stop(window.event)
         }
     }
     window.onmousemove = function() {
         if (cursorDown) {
-            Tools.getCurrentTool().update(window.event)
+            Tools.currentTool.update(window.event)
         }
     }    
 }

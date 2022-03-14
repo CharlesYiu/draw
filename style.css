@@ -173,10 +173,18 @@ input:focus {
 /* Color input */
 .colorinput {
     -webkit-appearance: none;
-    background-color: transparent;
     border-style: none;
     position: relative;
     width: 100%;
     margin-top: 10%;
-    background-color: black;
+    background-color: whitesmoke;
+    border-radius: 8px;
+}
+.colorinput::-webkit-color-swatch {
+    border: none;
+    border-radius: 4px;
+}
+.colorinput::-moz-color-swatch {
+    border: none;
+    border-radius: 4px;
 }

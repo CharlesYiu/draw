@@ -26,27 +26,25 @@ const scribbleTool = document.getElementById("settings-tools-scribbletool")
 scribbleTool.onclick = () => {
     Tools.currentTool = Tools.ScribbleTool
     updateToolThickness()
+    updateToolColor()
 }
 const lineTool = document.getElementById("settings-tools-linetool")
 lineTool.onclick = () => {
     Tools.currentTool = Tools.LineTool
     updateToolThickness()
+    updateToolColor()
 }
 const squareTool = document.getElementById("settings-tools-squaretool")
 squareTool.onclick = () => {
     Tools.currentTool = Tools.ShapeTool
     updateToolThickness()
+    updateToolColor()
 }
 
 // Thickness
 const thicknessInput = document.getElementById("settings-linewidth-value")
 function updateToolThickness() {
-    const currentTool = Tools.getCurrentTool()
-    if (currentTool.thickness === null) {
-        thicknessInput.valueAsNumber = currentTool.defaultThickness
-    } else {
-        thicknessInput.valueAsNumber = currentTool.thickness
-    }
+    thicknessInput.valueAsNumber = Tools.currentTool.thickness
 }
 updateToolThickness()
 thicknessInput.onblur = () => {
@@ -55,7 +53,7 @@ thicknessInput.onblur = () => {
     } else if (thicknessInput.valueAsNumber < 1) {
         thicknessInput.valueAsNumber = 1
     }
-    Tools.getCurrentTool().thickness = thicknessInput.valueAsNumber
+    Tools.currentTool.thickness = thicknessInput.valueAsNumber
 }
 document.getElementById("settings-linewidth-add").onclick = () => {
     if (thicknessInput.valueAsNumber < 250) {
@@ -63,7 +61,7 @@ document.getElementById("settings-linewidth-add").onclick = () => {
     } else {
         thicknessInput.valueAsNumber = 250
     }
-    Tools.getCurrentTool().thickness = thicknessInput.valueAsNumber
+    Tools.currentTool.thickness = thicknessInput.valueAsNumber
 }
 document.getElementById("settings-linewidth-minus").onmousedown = () => {
     if (thicknessInput.valueAsNumber > 1) {
@@ -71,5 +69,34 @@ document.getElementById("settings-linewidth-minus").onmousedown = () => {
     } else {
         thicknessInput.valueAsNumber = 1
     }
-    Tools.getCurrentTool().thickness = thicknessInput.valueAsNumber
+    Tools.currentTool.thickness = thicknessInput.valueAsNumber
+}
+
+// Color
+const colorPicker = document.getElementById("settings-linecolor-value")
+const alphaSlider = document.getElementById("settings-linecolor-avalue")
+function updateToolColor() {
+    const color = Tools.currentTool.color
+    function numberToHex(number) {
+        const hex = number.toString(16)
+        return hex.length === 1 ? "0"+hex : hex
+    }
+    const hex = `#${numberToHex(color.red)}${numberToHex(color.green)}${numberToHex(color.blue)}`
+    colorPicker.value = hex
+    alphaSlider.valueAsNumber = color.alpha * 100 
+}
+updateToolColor()
+colorPicker.oninput = () => {
+    const hex = colorPicker.value
+    const color = new Color(
+        parseInt(hex.substr(1,2), 16),
+        parseInt(hex.substr(3,2), 16),
+        parseInt(hex.substr(5,2), 16),
+        alphaSlider.valueAsNumber
+    )
+    Tools.currentTool.color = color
+}
+alphaSlider.oninput = () => {
+    Tools.currentTool.color.alpha = alphaSlider.valueAsNumber / 100
+    console.log(alphaSlider.valueAsNumber)
 }

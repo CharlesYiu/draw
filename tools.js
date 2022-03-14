@@ -84,17 +84,28 @@ class Color {
         return value
     }
     formatStyle() {
-        return `rgb(${this.red},${this.green},${this.blue})`
+        return `rgba(${this.red},${this.green},${this.blue},${this.alpha})`
     }
 }
 
 class Tools {
-    static currentTool = null
     static Tool = class {
         static defaultThickness = 10
         static defaultColor = Color.ColorBlack
-        static thickness = null
-        static color = null
+        static set thickness(value) { this.Thickness = value }
+        static get thickness() {
+            if (this.Thickness == null) {
+                return this.defaultThickness
+            }
+            return this.Thickness
+        }
+        static set color(value) { this.Color = value }
+        static get color() {
+            if (this.Color == null) {
+                return this.defaultColor
+            }
+            return this.Color
+        }
     
         static startX = undefined
         static startY = undefined
@@ -110,16 +121,8 @@ class Tools {
                 cursorEvent.clientX,
                 cursorEvent.clientY
             )
-            if (this.thickness === null) {
-                context.lineWidth = this.defaultThickness
-            } else {
-                context.lineWidth = this.thickness
-            }
-            if (this.color === null) {
-                context.stokeStyle = this.defaultColor.formatStyle()
-            } else {
-                context.stokeStyle = this.color.formatStyle()
-            }
+            context.lineWidth = this.thickness
+            context.strokeStyle = this.color.formatStyle()
             context.lineCap = "round"
             context.stroke()
             clearCanvas(previewContext)
@@ -132,33 +135,25 @@ class Tools {
                 cursorEvent.clientX,
                 cursorEvent.clientY
             )
-            if (this.thickness === null) {
-                previewContext.lineWidth = this.defaultThickness
-            } else {
-                previewContext.lineWidth = this.thickness
-            }
-            if (this.color === null) {
-                previewContext.stokeStyle = this.defaultColor.formatStyle()
-            } else {
-                previewContext.stokeStyle = this.color.formatStyle()
-            }
+            previewContext.lineWidth = this.thickness
+            previewContext.strokeStyle = this.color.formatStyle()
             previewContext.lineCap = "round"
             previewContext.stroke()
         }
     }
     static ScribbleTool = class extends Tools.Tool {
         static defaultSkip = 3
-        static skip = null
+        static set skip(value) { this.Skip = value }
+        static get skip() {
+            if (this.Skip == null) {
+                return this.defaultSkip
+            }
+            return this.Skip
+        }
 
         static update(cursorEvent) {
-            let skip = this.skip
-            if (this.skip === null) {
-                skip = this.defaultSkip
-            }
-
             const skipped = Math.sqrt(Math.abs(cursorEvent.clientX - this.startX)+Math.abs(cursorEvent.clientY - this.startY))
-            console.log(skipped, cursorEvent.clientX, cursorEvent.clientY)
-            if (skipped >= skip) {
+            if (skipped >= this.skip) {
                 super.stop(cursorEvent)
                 super.start(cursorEvent)
             }
@@ -168,7 +163,13 @@ class Tools {
     static LineTool = Tools.Tool
     static ShapeTool = class extends Tools.Tool {
         static defaultShape = "Rectangle"
-        static shape = null 
+        static set shape(value) { this.Shape = value }
+        static get shape() {
+            if (this.Shape == null) {
+                return this.defaultShape
+            }
+            return this.Shape
+        }
 
         static start(cursorEvent) {
             this.startX = cursorEvent.clientX
@@ -176,12 +177,8 @@ class Tools {
         }
         static stop(cursorEvent) {
             context.beginPath()
-            let shape = this.shape
-            if (this.shape === null) {
-                shape = this.defaultShape
-            }
-            if (shape === "Circle") {
-                if (pressedKeys.includes("Shift")) {
+            if (this.shape === "Circle") {
+                if (pressedShift) {
                     const radius = Math.abs((cursorEvent.clientX - this.startX) / 2)
                     if (cursorEvent.clientY < this.startY) {
                         if (cursorEvent.clientX < this.startX) {
@@ -218,8 +215,8 @@ class Tools {
                         0, 2*Math.PI, false
                     );
                 }
-            } else if (shape === "Rectangle") {
-                if (pressedKeys.includes("Shift")) {
+            } else if (this.shape === "Rectangle") {
+                if (pressedShift) {
                     const size = Math.abs(cursorEvent.clientX - this.startX)
                     if (cursorEvent.clientY < this.startY) {
                         if (cursorEvent.clientX < this.startX) {
@@ -240,28 +237,16 @@ class Tools {
                     context.rect(this.startX, this.startY, sizeX, sizeY)
                 }
             }
-            if (this.thickness === null) {
-                context.lineWidth = this.defaultThickness
-            } else {
-                context.lineWidth = this.thickness
-            }
-            if (this.color === null) {
-                context.stokeStyle = this.defaultColor.formatStyle()
-            } else {
-                context.stokeStyle = this.color.formatStyle()
-            }
+            context.lineWidth = this.thickness
+            context.strokeStyle = this.color.formatStyle()
             context.stroke()
             clearCanvas(previewContext)
         }
         static update(cursorEvent) {
             clearCanvas(previewContext)
             previewContext.beginPath()
-            let shape = this.shape
-            if (this.shape === null) {
-                shape = this.defaultShape
-            }
-            if (shape === "Circle") {
-                if (pressedKeys.includes("Shift")) {
+            if (this.shape === "Circle") {
+                if (pressedShift) {
                     const radius = Math.abs((cursorEvent.clientX - this.startX) / 2)
                     if (cursorEvent.clientY < this.startY) {
                         if (cursorEvent.clientX < this.startX) {
@@ -298,8 +283,8 @@ class Tools {
                         0, 2*Math.PI, false
                     );
                 }
-            } else if (shape === "Rectangle") {
-                if (pressedKeys.includes("Shift")) {
+            } else if (this.shape === "Rectangle") {
+                if (pressedShift) {
                     const size = Math.abs(cursorEvent.clientX - this.startX)
                     if (cursorEvent.clientY < this.startY) {
                         if (cursorEvent.clientX < this.startX) {
@@ -320,25 +305,17 @@ class Tools {
                     previewContext.rect(this.startX, this.startY, sizeX, sizeY)
                 }
             }
-            if (this.thickness === null) {
-                previewContext.lineWidth = this.defaultThickness
-            } else {
-                previewContext.lineWidth = this.thickness
-            }
-            if (this.color === null) {
-                previewContext.stokeStyle = this.defaultColor.formatStyle()
-            } else {
-                previewContext.stokeStyle = this.color.formatStyle()
-            }
+            previewContext.lineWidth = this.thickness
+            previewContext.strokeStyle = this.color.formatStyle()
             previewContext.stroke()
         }
     }
     static defaultTool = Tools.ScribbleTool
-    static currentTool = null
-    static getCurrentTool() {
-        if (Tools.currentTool === null) {
+    static set currentTool(value) { Tools.CurrentTool = value }
+    static get currentTool() {
+        if (Tools.CurrentTool == null) {
             return Tools.defaultTool
         }
-        return Tools.currentTool
+        return Tools.CurrentTool
     }
 }
