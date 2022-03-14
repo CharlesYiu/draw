@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <canvas id="previewCanvas"></canvas> 
+    <div id="overlay">
+        <button id="showsettings" class="singlebutton" hidden>Show Settings</button>
+        <div id="settings">
+            <button id="hidesettings" class="singlebutton">Hide Settings</button>
+            <div id="settings-linecolor" class="subsettings">
+                <p id="settings-linecolor-header" class="subsettings-header">Color:</p>
+                <input type="range" id="settings-linecolor-avalue" class="sliderinput">
+                <div id="settings-linecolor-gridcolorpicker" class="gridcolorpickerinput"></div>
+                <input type="color" id="settings-linecolor-value" class="colorinput">
+            </div>
+            <div id="settings-linewidth" class="subsettings">
+                <p id="settings-linewidth-header" class="subsettings-header">Width:</p>
+                <input type="number" id="settings-linewidth-value" class="numberinput">
+                <button id="settings-linewidth-add" class="doublebuttons">+</button>
+                <button id="settings-linewidth-minus" class="doublebuttons">-</button>
+            </div>
+            <div id="settings-tools" class="subsettings">
+                <p id="settings-tools-header" class="subsettings-header">Tool:</p>
+                <button id="settings-tools-scribbletool" class="singlebutton">Scribble</button>
+                <button id="settings-tools-linetool" class="doublebuttons">Line</button>
+                <button id="settings-tools-squaretool" class="doublebuttons">Square</button>
+            </div>
+            <div id="settings-undoredo" class="subsettings">
+                <button id="settings-undoredo-undo" class="doublebuttons">Undo</button>
+                <button id="settings-undoredo-redo" class="doublebuttons">Redo</button>
+            </div>
+            <button id="settings-clear" class="singlebutton">Clear Canvas</button>
+            <button id="settings-showadvanced" class="singlebutton">Show Advanced</button>
+            <div id="settings-advanced" class="subsettings" hidden>
+                <p id="settings-advanced-header" class="subsettings-header">Advanced:</p>
+                <button id="settings-advanced-cursor" class="singlebutton">Use Default Cursor</button>
+                <button id="settings-advanced-forcemobile" class="singlebutton">Force Mobile</button>
+            </div>
+            <div id="settings-savereset" class="subsettings">
+                <button id="settings-savereset-save" class="singlebutton">Save Settings</button>
+                <button id="settings-savereset-reset" class="singlebutton">Reset Settings</button>
+            </div>
+        </div>
+    </div>
+    <script src="tools.js"></script>
+    <script src="overlay.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,182 @@
+body, html {
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+    overflow: hidden;
+    font-family: Arial, Helvetica, sans-serif;
+}
+* {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none;
+}
+/* Canvas */
+#canvas, #previewCanvas {
+    position: fixed;
+}
+/* Settings */
+#settings {
+    position: fixed;
+    background-color: rgb(218, 218, 218);
+    text-align: center;
+    border-radius: 10px;
+    accent-color: rgba(0, 0, 0, 0.25);
+    padding: 10px;
+    margin: 10px;
+    width: 147.5px;
+    overflow-y: scroll;
+    max-height: calc(100% - 40px);
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+    transition-duration: 0.25s
+}
+#settings::-webkit-scrollbar {
+    display: none;
+}
+.subsettings {
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: 10px;
+}
+.subsettings-header { margin: 3.75px; }
+
+/* Buttons */
+#showsettings {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 147.5px;
+    margin: 20px;
+    opacity: 50%;
+    background-color: rgb(218, 218, 218);
+}
+#settings-clear { margin-top: 10px; }
+#settings-linewidth-add, #settings-linewidth-minus { margin-top: -10px; }
+#settings-tools-linetool, #settings-advanced-forcemobile, #settings-savereset-reset { margin-top: 2.5%; }
+#settings-linecolor { position: relative; }
+#settings-showadvanced { margin-top: 10px; }
+/* Buttons in general */
+.singlebutton, .doublebuttons {
+    border-style: none;
+    border-radius: 10px;
+    background-color: whitesmoke;
+    padding: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    text-align: center;
+    cursor: pointer;
+}
+/* buttons */
+.singlebutton { width: 100%; }
+.doublebuttons { width: 47.5%; }
+.singlebutton:active, .doublebuttons:active {
+    color: whitesmoke;
+}
+/* input */
+input:focus {
+    outline: none;
+}
+/* number input */
+.numberinput {
+    border-style: none;
+    border-radius: 10px;
+    background-color: whitesmoke;
+    padding: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    text-align: center;
+    cursor: pointer;
+    width: 82.5%;
+    text-align: center;
+    margin-bottom: 5%;
+    -moz-appearance: textfield;
+}
+.numberinput::-webkit-outer-spin-button, .numberinput::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+/* sliders */
+.sliderinput {
+    height: 21px;
+    -webkit-appearance: none;
+    background: none;
+    width: 100%;
+}
+.sliderinput::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 2px;
+    background: #000000;
+    border-radius: 2px;
+    border: 0px solid #000000;
+}
+.sliderinput::-webkit-slider-thumb {
+    border: 0px solid #000000;
+    height: 15px;
+    width: 15px;
+    border-radius: 8px;
+    background: #FFFFFF;
+    -webkit-appearance: none;
+    margin-top: -6.5px;
+}
+.sliderinput:focus::-webkit-slider-runnable-track {
+    background: #000000;
+}
+.sliderinput::-moz-range-track {
+    width: 100%;
+    height: 2px;
+    background: #000000;
+    border-radius: 2px;
+    border: 0px solid #000000;
+}
+.sliderinput::-moz-range-thumb {
+    border: 0px solid #000000;
+    height: 15px;
+    width: 15px;
+    border-radius: 8px;
+    background: #FFFFFF;
+}
+.sliderinput::-ms-track {
+    width: 100%;
+    height: 2px;
+    background: transparent;
+    border-color: transparent;
+    color: transparent;
+}
+.sliderinput::-ms-fill-lower {
+    background: #000000;
+    border: 0px solid #000000;
+    border-radius: 4px;
+}
+.sliderinput::-ms-fill-upper {
+    background: #000000;
+    border: 0px solid #000000;
+    border-radius: 4px;
+}
+.sliderinput::-ms-thumb {
+    margin-top: 1px;
+    border: 0px solid #000000;
+    height: 15px;
+    width: 15px;
+    border-radius: 8px;
+    background: #FFFFFF;
+}
+.sliderinput:focus::-ms-fill-lower {
+    background: #000000;
+}
+.sliderinput:focus::-ms-fill-upper {
+    background: #000000;
+}
+/* Color input */
+.colorinput {
+    -webkit-appearance: none;
+    background-color: transparent;
+    border-style: none;
+    position: relative;
+    width: 100%;
+    margin-top: 10%;
+    background-color: black;
+}
