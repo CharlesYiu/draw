@@ -1,12 +1,9 @@
 const canvas = document.getElementById("canvas")
 const context = canvas.getContext("2d")
-context.canvas.width  = window.innerWidth
-context.canvas.height = window.innerHeight
-
 const previewCanvas = document.getElementById("previewCanvas")
 const previewContext = previewCanvas.getContext("2d")
-previewContext.canvas.width  = window.innerWidth
-previewContext.canvas.height = window.innerHeight
+const previewPreviewCanvas = document.getElementById("previewPreviewCanvas")
+const previewPreviewContext = previewPreviewCanvas.getContext("2d")
 function clearCanvas(context) {
     const canvas = context.canvas
     context.clearRect(0, 0, canvas.width, canvas.height)
@@ -16,6 +13,8 @@ function resizeCanvas() {
     canvas.height = window.innerHeight
     previewCanvas.width  = window.innerWidth
     previewCanvas.height = window.innerHeight
+    previewPreviewCanvas.width  = window.innerWidth
+    previewPreviewCanvas.height = window.innerHeight
 }
 window.onresize = () => {
     resizeCanvas()
@@ -56,12 +55,20 @@ class Color {
         red = 0,
         green = 0,
         blue = 0,
-        alpha = 0
+        alpha = 1
     ) {
         this.red = red
         this.green = green
         this.blue = blue
         this.alpha = alpha
+    }
+    static fromHex(hex) {
+        return new Color(
+            parseInt(hex.substr(1,2), 16),
+            parseInt(hex.substr(3,2), 16),
+            parseInt(hex.substr(5,2), 16),
+            1
+        )
     }
     formatValue(value, isAlpha) {
         if (isNaN(value)) {
@@ -83,8 +90,14 @@ class Color {
         }
         return value
     }
-    formatStyle() {
-        return `rgba(${this.red},${this.green},${this.blue},${this.alpha})`
+    toRGB() { return `rgb(${this.red},${this.green},${this.blue})` }
+    toRGBA() { return `rgba(${this.red},${this.green},${this.blue},${this.alpha})` }
+    toHex() {
+        function numberToHex(number) {
+            const hex = number.toString(16)
+            return hex.length === 1 ? "0" + hex : hex
+        }
+        return `#${numberToHex(this.red)}${numberToHex(this.green)}${numberToHex(this.blue)}`
     }
 }
 
@@ -122,7 +135,7 @@ class Tools {
                 cursorEvent.clientY
             )
             context.lineWidth = this.thickness
-            context.strokeStyle = this.color.formatStyle()
+            context.strokeStyle = this.color.toRGBA()
             context.lineCap = "round"
             context.stroke()
             clearCanvas(previewContext)
@@ -136,7 +149,7 @@ class Tools {
                 cursorEvent.clientY
             )
             previewContext.lineWidth = this.thickness
-            previewContext.strokeStyle = this.color.formatStyle()
+            previewContext.strokeStyle = this.color.toRGBA()
             previewContext.lineCap = "round"
             previewContext.stroke()
         }
@@ -150,14 +163,58 @@ class Tools {
             }
             return this.Skip
         }
+        
+        static previewX = undefined
+        static previewY = undefined
 
+        static start(cursorEvent) {
+            this.startX = cursorEvent.clientX
+            this.startY = cursorEvent.clientY
+            this.previewX = this.startX
+            this.previewY = this.startY
+            context.beginPath()
+            context.moveTo(this.startX, this.startY)
+        }
+        static stop(cursorEvent) {
+            context.lineWidth = this.thickness
+            context.strokeStyle = this.color.toRGBA()
+            context.lineCap = "round"
+            context.stroke()
+            clearCanvas(previewContext)
+            clearCanvas(previewPreviewContext)
+        }
         static update(cursorEvent) {
             const skipped = Math.sqrt(Math.abs(cursorEvent.clientX - this.startX)+Math.abs(cursorEvent.clientY - this.startY))
             if (skipped >= this.skip) {
-                super.stop(cursorEvent)
-                super.start(cursorEvent)
+                context.lineTo(
+                    cursorEvent.clientX,
+                    cursorEvent.clientY
+                )
+                previewContext.beginPath()
+                previewContext.moveTo(this.previewX, this.previewY)
+                previewContext.lineTo(
+                    cursorEvent.clientX,
+                    cursorEvent.clientY
+                )
+                previewContext.lineWidth = this.thickness
+                previewContext.strokeStyle = this.color.toRGB()
+                previewContext.lineCap = "round"
+                previewContext.stroke()
+                this.previewX = cursorEvent.clientX
+                this.previewY = cursorEvent.clientY
+
             }
-            super.update(cursorEvent)
+            clearCanvas(previewPreviewContext)
+            previewPreviewContext.beginPath()
+            previewPreviewContext.moveTo(this.previewX, this.previewY)
+            previewPreviewContext.lineTo(
+                cursorEvent.clientX,
+                cursorEvent.clientY
+            )
+            previewPreviewContext.lineWidth = this.thickness
+            previewPreviewContext.strokeStyle = this.color.toRGB()
+            previewPreviewContext.lineCap = "round"
+            previewPreviewContext.stroke()
         }
     }
     static LineTool = Tools.Tool
@@ -238,7 +295,7 @@ class Tools {
                 }
             }
             context.lineWidth = this.thickness
-            context.strokeStyle = this.color.formatStyle()
+            context.strokeStyle = this.color.toRGBA()
             context.stroke()
             clearCanvas(previewContext)
         }
@@ -306,7 +363,7 @@ class Tools {
                 }
             }
             previewContext.lineWidth = this.thickness
-            previewContext.strokeStyle = this.color.formatStyle()
+            previewContext.strokeStyle = this.color.toRGBA()
             previewContext.stroke()
         }
     }

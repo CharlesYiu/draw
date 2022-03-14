@@ -10,6 +10,10 @@
 <body>
     <canvas id="canvas"></canvas>
     <canvas id="previewCanvas"></canvas> 
+    <canvas id="previewPreviewCanvas"></canvas> 
+    <div id="cursor">
+        <div id="cursor-dot"></div>
+    </div>
     <div id="overlay">
         <button id="showsettings" class="singlebutton" hidden>Show Settings</button>
         <div id="settings">
@@ -49,6 +53,7 @@
             </div>
         </div>
     </div>
+    <script src="cursor.js"></script>
     <script src="tools.js"></script>
     <script src="overlay.js"></script>
     <script src="script.js"></script>

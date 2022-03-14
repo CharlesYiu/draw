@@ -1,10 +1,10 @@
 // TODO Implement the ability to change shapes when using the shape tool
 // TODO Implement the ability to hold to add/minus the thickness repeatedly
-// TODO Implement a custom cursor
 // TODO Implement undo and redo actions
 // TODO Make settings save to local storage when modified
 // TODO Remove save settings and reset settings button
 // TODO Add keyboard shortcuts for changing the settings quickly
+// FIXME Fix tools.js messy code
 let pressedShift = false
 let transparentSettings = false
 
@@ -26,7 +26,7 @@ window.onkeyup = function() {
 
 window.onload = () => {
     let cursorDown = false
-    previewCanvas.onmousedown = function() {
+    canvas.onmousedown = function() {
         cursorDown = true
         settings.style.opacity = "0.25"
         Tools.currentTool.start(window.event)
@@ -41,6 +41,9 @@ window.onload = () => {
         }
     }
     window.onmousemove = function() {
+        if (useCursor) {
+            updateCursor()
+        }
         if (cursorDown) {
             Tools.currentTool.update(window.event)
         }

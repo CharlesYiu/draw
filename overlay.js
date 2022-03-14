@@ -77,26 +77,31 @@ const colorPicker = document.getElementById("settings-linecolor-value")
 const alphaSlider = document.getElementById("settings-linecolor-avalue")
 function updateToolColor() {
     const color = Tools.currentTool.color
-    function numberToHex(number) {
-        const hex = number.toString(16)
-        return hex.length === 1 ? "0"+hex : hex
-    }
-    const hex = `#${numberToHex(color.red)}${numberToHex(color.green)}${numberToHex(color.blue)}`
-    colorPicker.value = hex
+    colorPicker.value = color.toHex()
     alphaSlider.valueAsNumber = color.alpha * 100 
 }
 updateToolColor()
 colorPicker.oninput = () => {
     const hex = colorPicker.value
-    const color = new Color(
-        parseInt(hex.substr(1,2), 16),
-        parseInt(hex.substr(3,2), 16),
-        parseInt(hex.substr(5,2), 16),
-        alphaSlider.valueAsNumber
-    )
-    Tools.currentTool.color = color
+    Tools.currentTool.color = Color.fromHex(hex)
 }
 alphaSlider.oninput = () => {
-    Tools.currentTool.color.alpha = alphaSlider.valueAsNumber / 100
-    console.log(alphaSlider.valueAsNumber)
+    const color = Tools.currentTool.color
+    color.alpha = alphaSlider.valueAsNumber / 100
+}
+
+// Cursor
+const toggleCursor = document.getElementById("settings-advanced-cursor")
+toggleCursor.onclick = () => {
+    useCursor = !useCursor
+    const cursorElement = document.getElementById("cursor")
+    if (!useCursor) {
+        cursorElement.hidden = true
+        previewPreviewCanvas.style.cursor = "default"
+        toggleCursor.textContent = "Use Custom Cursor"
+    } else {
+        cursorElement.hidden = false
+        previewPreviewCanvas.style.cursor = "none"
+        toggleCursor.textContent = "Use Default Cursor"
+    }
 }
