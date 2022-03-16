@@ -20,36 +20,67 @@ window.onresize = () => {
     resizeCanvas()
 }
 resizeCanvas()
+let actions = []
 
 class Color {
-    static ColorWhite = new Color(255, 255, 255, 1)
-    static ColorBlack = new Color(0, 0, 0, 1)
-    static ColorRed = new Color(255, 0, 0, 1)
-    static ColorOrange = new Color(255, 255, 0, 1)
-    static ColorYellow = new Color(255, 255, 0, 1)
-    static ColorGreen = new Color(0, 255, 0, 1)
-    static ColorBlue = new Color(0, 0, 255, 1)
-    static ColorPurple = new Color(255, 0, 255, 1)
+    static White = new Color(255, 255, 255, 1)
+    static Black = new Color(0, 0, 0, 1)
+    static Red = new Color(255, 0, 0, 1)
+    static Orange = new Color(255, 128, 0, 1)
+    static Yellow = new Color(255, 255, 0, 1)
+    static Green = new Color(0, 255, 0, 1)
+    static Blue = new Color(0, 0, 255, 1)
+    static Purple = new Color(128, 0, 128, 1)
     
-    get red() { return this.Red }
+    get hex() {
+        return `#${this._numberToHex(this._red)}${this._numberToHex(this._green)}${this._numberToHex(this._blue)}`
+    }
+    set hex(hex) {
+        this.red = parseInt(hex.substring(1,2), 16)
+        this.green = parseInt(hex.substring(3,2), 16)
+        this.blue = parseInt(hex.substring(5,2), 16)
+    }
+    get rgb() {
+        return `rgb(${this._red},${this._green},${this._blue})`
+    }
+    set rgb(rgb) {
+        rgb = rgb.substring(rgb.indexOf("(") + 1, rgb.indexOf(")"))
+        const values = rgb.split(",")
+        this.red = parseInt(values[0], 10)
+        this.green = parseInt(values[1], 10)
+        this.blue = parseInt(values[2], 10)
+    }
+    get rgba() {
+        return `rgb(${this._red},${this._green},${this._blue}),${this._alpha})` 
+    }
+    set rgba(rgba) {
+        rgba = rgba.substring(rgba.indexOf("(") + 1, rgba.indexOf(")"))
+        const values = rgba.split(",")
+        this.red = parseInt(values[0], 10)
+        this.green = parseInt(values[1], 10)
+        this.blue = parseInt(values[2], 10)
+        this.alpha = parseInt(values[3], 10)
+    }
+
+    get red() { return this._red }
     set red(value) {
-        this.Red = this.formatValue(value, false)
-        return this.Red
+        this._red = this._formatValue(value)
+        return this._red
     }
-    get green() { return this.Green }
+    get green() { return this._green }
     set green(value) {
-        this.Green = this.formatValue(value, false)
-        return this.Green
+        this._green = this._formatValue(value)
+        return this._green
     }
-    get blue() { return this.Blue }
+    get blue() { return this._blue }
     set blue(value) {
-        this.Blue = this.formatValue(value, false)
-        return this.Blue
+        this._blue = this._formatValue(value)
+        return this._blue
     }
-    get alpha() { return this.Alpha }
+    get alpha() { return this._alpha }
     set alpha(value) {
-        this.Alpha = this.formatValue(value, true)
-        return this.Alpha
+        this._alpha = this._formatValue(value, true)
+        return this._alpha
     }
     constructor(
         red = 0,
@@ -62,15 +93,8 @@ class Color {
         this.blue = blue
         this.alpha = alpha
     }
-    static fromHex(hex) {
-        return new Color(
-            parseInt(hex.substr(1,2), 16),
-            parseInt(hex.substr(3,2), 16),
-            parseInt(hex.substr(5,2), 16),
-            1
-        )
-    }
-    formatValue(value, isAlpha) {
+
+    _formatValue(value, isAlpha = false) {
         if (isNaN(value)) {
             value = 0
         }
@@ -82,7 +106,7 @@ class Color {
             }
             value = Math.round(value)
         } else {
-            if (value < 0) {
+            if (value < 0) { 
                 value = 0
             } else if (value > 1) {
                 value = 1
@@ -90,14 +114,9 @@ class Color {
         }
         return value
     }
-    toRGB() { return `rgb(${this.red},${this.green},${this.blue})` }
-    toRGBA() { return `rgba(${this.red},${this.green},${this.blue},${this.alpha})` }
-    toHex() {
-        function numberToHex(number) {
-            const hex = number.toString(16)
-            return hex.length === 1 ? "0" + hex : hex
-        }
-        return `#${numberToHex(this.red)}${numberToHex(this.green)}${numberToHex(this.blue)}`
+    _hexFromValue(number) {
+        const hex = number.toString(16)
+        return hex.length === 1 ? "0" + hex : hex
     }
 }
 
@@ -138,6 +157,21 @@ class Tools {
             context.strokeStyle = this.color.toRGBA()
             context.lineCap = "round"
             context.stroke()
+            actions.push(new this.Action(
+                "line",
+                {
+                    a: {
+                        x: this.startX, 
+                        y: this.startY
+                    },
+                    b: {
+                        x: cursorEvent.clientX,
+                        y: cursorEvent.clientY
+                    }
+                },
+                this.thickness,
+                this.color
+            ))
             clearCanvas(previewContext)
         }
         static update(cursorEvent) {
@@ -149,9 +183,17 @@ class Tools {
                 cursorEvent.clientY
             )
             previewContext.lineWidth = this.thickness
-            previewContext.strokeStyle = this.color.toRGBA()
+            previewContext.strokeStyle = this.color.rgba
             previewContext.lineCap = "round"
             previewContext.stroke()
+        }
+        static Action = class {
+            constructor(type, points, thickness, color) {
+                this.type = type
+                this.points = points
+                this.thickness = thickness
+                this.color = color
+            }
         }
     }
     static ScribbleTool = class extends Tools.Tool {
@@ -166,20 +208,28 @@ class Tools {
         
         static previewX = undefined
         static previewY = undefined
+        static points = []
 
         static start(cursorEvent) {
             this.startX = cursorEvent.clientX
             this.startY = cursorEvent.clientY
             this.previewX = this.startX
             this.previewY = this.startY
+            this.points.push({x: this.startX, y: this.startY})
             context.beginPath()
             context.moveTo(this.startX, this.startY)
         }
         static stop(cursorEvent) {
             context.lineWidth = this.thickness
-            context.strokeStyle = this.color.toRGBA()
+            context.strokeStyle = this.color.rgba
             context.lineCap = "round"
             context.stroke()
+            actions.push(new this.Action(
+                "scribble",
+                this.points,
+                this.thickness,
+                this.color
+            ))
             clearCanvas(previewContext)
             clearCanvas(previewPreviewContext)
         }
@@ -197,9 +247,10 @@ class Tools {
                     cursorEvent.clientY
                 )
                 previewContext.lineWidth = this.thickness
-                previewContext.strokeStyle = this.color.toRGB()
+                previewContext.strokeStyle = this.color.rgb
                 previewContext.lineCap = "round"
                 previewContext.stroke()
+                points.push({x: cursorEvent.clientX, y: cursorEvent.clientY})
                 this.previewX = cursorEvent.clientX
                 this.previewY = cursorEvent.clientY
 
@@ -212,14 +263,14 @@ class Tools {
                 cursorEvent.clientY
             )
             previewPreviewContext.lineWidth = this.thickness
-            previewPreviewContext.strokeStyle = this.color.toRGB()
+            previewPreviewContext.strokeStyle = this.color.rgb
             previewPreviewContext.lineCap = "round"
             previewPreviewContext.stroke()
         }
     }
     static LineTool = Tools.Tool
     static ShapeTool = class extends Tools.Tool {
-        static defaultShape = "Rectangle"
+        static defaultShape = "rectangle"
         static set shape(value) { this.Shape = value }
         static get shape() {
             if (this.Shape == null) {
@@ -234,7 +285,7 @@ class Tools {
         }
         static stop(cursorEvent) {
             context.beginPath()
-            if (this.shape === "Circle") {
+            if (this.shape === "circle") {
                 if (pressedShift) {
                     const radius = Math.abs((cursorEvent.clientX - this.startX) / 2)
                     if (cursorEvent.clientY < this.startY) {
@@ -272,7 +323,7 @@ class Tools {
                         0, 2*Math.PI, false
                     );
                 }
-            } else if (this.shape === "Rectangle") {
+            } else if (this.shape === "rectangle") {
                 if (pressedShift) {
                     const size = Math.abs(cursorEvent.clientX - this.startX)
                     if (cursorEvent.clientY < this.startY) {
@@ -297,12 +348,27 @@ class Tools {
             context.lineWidth = this.thickness
             context.strokeStyle = this.color.toRGBA()
             context.stroke()
+            actions.push(new this.Action(
+                this.shape === "circle" ? (pressedShift ? "circle" : "ellipse") : (pressedShift ? "square" : "rectangle"),
+                {
+                    a: {
+                        x: this.startX,
+                        y: this.startY
+                    },
+                    b: {
+                        x: cursorEvent.clientX,
+                        y: cursorEvent.clientY
+                    }
+                },
+                this.thickness,
+                this.color
+            ))
             clearCanvas(previewContext)
         }
         static update(cursorEvent) {
             clearCanvas(previewContext)
             previewContext.beginPath()
-            if (this.shape === "Circle") {
+            if (this.shape === "circle") {
                 if (pressedShift) {
                     const radius = Math.abs((cursorEvent.clientX - this.startX) / 2)
                     if (cursorEvent.clientY < this.startY) {
@@ -340,7 +406,7 @@ class Tools {
                         0, 2*Math.PI, false
                     );
                 }
-            } else if (this.shape === "Rectangle") {
+            } else if (this.shape === "rectangle") {
                 if (pressedShift) {
                     const size = Math.abs(cursorEvent.clientX - this.startX)
                     if (cursorEvent.clientY < this.startY) {
@@ -363,7 +429,7 @@ class Tools {
                 }
             }
             previewContext.lineWidth = this.thickness
-            previewContext.strokeStyle = this.color.toRGBA()
+            previewContext.strokeStyle = this.color.rgba
             previewContext.stroke()
         }
     }
