@@ -26,3 +26,15 @@ function updateCursor() {
         if (cursorElement.style.left == leftStyle && cursorElement.style.top == topStyle) { cursorElement.hidden = true }
     }, 2500)
 }
+function setUseCursor() {
+    const cursorElement = document.getElementById("cursor")
+    if (!useCursor) {
+        cursorElement.hidden = true
+        previewPreviewCanvas.style.cursor = "default"
+        toggleCursor.textContent = "Use Custom Cursor"
+    } else {
+        cursorElement.hidden = false
+        previewPreviewCanvas.style.cursor = "none"
+        toggleCursor.textContent = "Use Default Cursor"
+    }
+}

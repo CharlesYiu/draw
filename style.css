@@ -62,7 +62,7 @@ body, html {
 }
 #settings-clear { margin-top: 10px; }
 #settings-linewidth-add, #settings-linewidth-minus { margin-top: -10px; }
-#settings-tools-linetool, #settings-advanced-forcemobile, #settings-savereset-reset { margin-top: 2.5%; }
+#settings-tools-linetool, #settings-advanced-forcemobile { margin-top: 2.5%; }
 #settings-linecolor { position: relative; }
 #settings-showadvanced { margin-top: 10px; }
 /* Buttons in general */
