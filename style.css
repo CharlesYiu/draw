@@ -5,6 +5,10 @@ body, html {
     overflow: hidden;
     font-family: Arial, Helvetica, sans-serif;
 }
+:root {
+    touch-action: pan-x pan-y;
+    height: 100% 
+  }
 * {
     -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
@@ -49,7 +53,6 @@ body, html {
     margin-top: 10px;
 }
 .subsettings-header { margin: 3.75px; }
-
 /* Buttons */
 #showsettings {
     position: fixed;
@@ -64,7 +67,10 @@ body, html {
 #settings-linewidth-add, #settings-linewidth-minus { margin-top: -10px; }
 #settings-tools-linetool, #settings-advanced-forcemobile { margin-top: 2.5%; }
 #settings-linecolor { position: relative; }
-#settings-showadvanced { margin-top: 10px; }
+#settings-showadvanced, #settings-clear { margin-top: 10px; }
+#settings-tools-squaretool, #settings-tools-circletool {
+    margin-top: 5px;
+}
 /* Buttons in general */
 .singlebutton, .doublebuttons {
     border-style: none;
@@ -76,11 +82,14 @@ body, html {
     text-align: center;
     cursor: pointer;
 }
+.highlighted {
+    background-color: rgb(190, 190, 190);
+}
 /* buttons */
 .singlebutton { width: 100%; }
 .doublebuttons { width: 47.5%; }
 .singlebutton:active, .doublebuttons:active {
-    color: whitesmoke;
+    background-color: rgb(190, 190, 190);
 }
 /* input */
 input:focus {

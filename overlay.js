@@ -1,3 +1,36 @@
+function onMove(element, action) {
+    element.ontouchmove = function() { action(true) }
+    element.onmousemove = function() { action(false) }
+}
+function onStart(element, action) {
+    element.ontouchstart = function() { action(true) }
+    element.onmousedown = function() { action(false) }
+}
+function onEnd(element, action) {
+    element.ontouchend = function() { action(true) }
+    element.onmouseup = function() { action(false) }
+}
+// Helper for add thickness, minus thickness, undo action and redo action
+function holdAction(action, element) {
+    let pressing = false
+    onStart(element, function() {
+        if (pressing) { return }
+        pressing = true
+        function stopAction() {
+            pressing = false
+            element.onmouseup = null
+            element.ontouchend = null
+        }
+        function repeatAction() {
+            if (!pressing) { return }
+            action()
+            setTimeout(repeatAction, 125)
+        }
+        onEnd(element, stopAction)
+        action()
+        setTimeout(function() { if (pressing) {repeatAction()} }, 1000)
+    })
+}
 const settings = document.getElementById("settings")
 
 // Hide and show settings
@@ -21,24 +54,45 @@ showAdvanced.onclick = function() {
 }
 // Tools
 const scribbleTool = document.getElementById("settings-tools-scribbletool")
+const lineTool = document.getElementById("settings-tools-linetool")
+const squareTool = document.getElementById("settings-tools-squaretool")
+const circleTool = document.getElementById("settings-tools-circletool")
 scribbleTool.onclick = function() {
     Tools.currentTool = Tools.ScribbleTool
+    lineTool.classList.remove("highlighted")
+    squareTool.classList.remove("highlighted")
+    circleTool.classList.remove("hightlighted")
+    scribbleTool.classList.add("highlighted")
     updateToolThickness()
     updateToolColor()
 }
-const lineTool = document.getElementById("settings-tools-linetool")
 lineTool.onclick = function() {
     Tools.currentTool = Tools.LineTool
+    squareTool.classList.remove("highlighted")
+    scribbleTool.classList.remove("highlighted")
+    circleTool.classList.remove("hightlighted")
+    lineTool.classList.add("highlighted")
     updateToolThickness()
     updateToolColor()
 }
-const squareTool = document.getElementById("settings-tools-squaretool")
 squareTool.onclick = function() {
-    Tools.currentTool = Tools.ShapeTool
+    Tools.currentTool = Tools.SquareTool
+    lineTool.classList.remove("highlighted")
+    scribbleTool.classList.remove("highlighted")
+    circleTool.classList.remove("hightlighted")
+    squareTool.classList.add("highlighted")
     updateToolThickness()
     updateToolColor()
 }
-
+circleTool.onclick = function() {
+    Tools.currentTool = Tools.CircleTool
+    lineTool.classList.remove("highlighted")
+    scribbleTool.classList.remove("highlighted")
+    squareTool.classList.remove("hightlighted")
+    circleTool.classList.add("highlighted")
+    updateToolThickness()
+    updateToolColor()
+}
 // Color
 const colorPicker = document.getElementById("settings-linecolor-value")
 const alphaSlider = document.getElementById("settings-linecolor-avalue")
@@ -49,7 +103,7 @@ function updateToolColor() {
 }
 colorPicker.oninput = function() {
     const hex = colorPicker.value
-    Tools.currentTool.color = Color.fromHex(hex)
+    Tools.currentTool.color.hex = hex
     const color = Tools.currentTool.color
     const name = Tools.currentTool.name
     localStorage.setItem(name+"-hex", color.hex)
@@ -83,26 +137,6 @@ thicknessInput.onblur = function() {
     localStorage.setItem(Tools.currentTool.name+"-thickness", thicknessInput.value)
 }
 
-// Helper for add thickness, minus thickness, undo action and redo action
-function holdAction(action, element) {
-    let pressing = false
-    element.onmousedown = function() {
-        if (pressing) { return }
-        pressing = true
-        function stopAction() {
-            pressing = false
-            element.onmouseup = null
-        }
-        function repeatAction() {
-            if (!pressing) { return }
-            action()
-            setTimeout(repeatAction, 125)
-        }
-        element.onmouseup = stopAction
-        action()
-        setTimeout(function() { if (pressing) {repeatAction()} }, 1000)
-    }
-}
 // thickness buttons
 holdAction(
     function() {
@@ -192,14 +226,23 @@ function loadSettings() {
     if (newThickness = localStorage.getItem("scribbletool-thickness")) {
         Tools.ScribbleTool.thickness = parseInt(newThickness, 10)
     }
-    if (newHex = localStorage.getItem("shapetool-hex")) {
-        Tools.ShapeTool.color = Color.fromHex(newHex)
+    if (newHex = localStorage.getItem("squaretool-hex")) {
+        Tools.SquareTool.color = Color.fromHex(newHex)
     }
-    if (newAlpha = localStorage.getItem("shapetool-alpha")) {
-        Tools.ShapeTool.color.alpha = parseInt(newAlpha, 10) / 100
+    if (newAlpha = localStorage.getItem("squaretool-alpha")) {
+        Tools.SquareTool.color.alpha = parseInt(newAlpha, 10) / 100
     }
-    if (newThickness = localStorage.getItem("shapetool-thickness")) {
-        Tools.ShapeTool.thickness = parseInt(newThickness, 10)
+    if (newThickness = localStorage.getItem("squaretool-thickness")) {
+        Tools.SquareTool.thickness = parseInt(newThickness, 10)
+    }
+    if (newHex = localStorage.getItem("circletool-hex")) {
+        Tools.CircleTool.color = Color.fromHex(newHex)
+    }
+    if (newAlpha = localStorage.getItem("circletool-alpha")) {
+        Tools.CircleTool.color.alpha = parseInt(newAlpha, 10) / 100
+    }
+    if (newThickness = localStorage.getItem("circletool-thickness")) {
+        Tools.CircleTool.thickness = parseInt(newThickness, 10)
     }
     updateToolThickness()
     updateToolColor()

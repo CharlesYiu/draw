@@ -1,6 +1,4 @@
-// TODO Implement the ability to change shapes when using the shape tool
 // TODO Add keyboard shortcuts for changing the settings quickly
-// TODO Make the selected tool's button be highlighted
 // TODO Implement export as image button
 // TODO Implement save as project button
 let pressedShift = false
@@ -24,26 +22,26 @@ window.onkeyup = function() {
 
 window.onload = () => {
     let cursorDown = false
-    canvas.onmousedown = function() {
+    onStart(canvas, function(mobile) {
         settings.style.opacity = "0.25"
-        Tools.currentTool.start(window.event)
+        Tools.currentTool.start(window.event, mobile)
         cursorDown = true
-    }
-    window.onmouseup = function() {
+    })
+    onEnd(window, function(mobile) {
         if (cursorDown) {
             cursorDown = false
             if (!transparentSettings) {
                 settings.style.opacity = "1"
             }
-            Tools.currentTool.stop(window.event)
+            Tools.currentTool.stop(window.event, mobile)
         }
-    }
-    window.onmousemove = function() {
+    })
+    onMove(window, function(mobile) {
         if (useCursor) {
             updateCursor()
         }
         if (cursorDown) {
-            Tools.currentTool.update(window.event)
+            Tools.currentTool.update(window.event, mobile)
         }
-    }    
+    })
 }

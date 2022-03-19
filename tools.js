@@ -171,18 +171,18 @@ class Tools {
         static startPoint = null
         static element = null
         
-        static start(event) {
-            event = this.Point.fromEvent(event)
+        static start(event, mobile) {
+            event = this.Point.fromEvent(event, mobile)
             this.startPoint = event
         }
-        static stop(event) {
+        static stop(event, mobile) {
             this.element.draw(context)
             elements.push(this.element)
             this.element = null
             clearCanvas(previewContext)
         }
-        static update(event) {
-            event = this.Point.fromEvent(event)
+        static update(event, mobile) {
+            event = this.Point.fromEvent(event, mobile)
             clearCanvas(previewContext)
             this.element = new this.Element(
                 [this.startPoint, event],
@@ -215,8 +215,12 @@ class Tools {
                 this.x = x
                 this.y = y
             }
-            static fromEvent(event) {
-                return new this(event.clientX, event.clientY)
+            static fromEvent(event, mobile) {
+                if (!mobile) {
+                    return new this(event.clientX, event.clientY)
+                } else {
+                    return new this(event.touches[0].clientX, event.touches[0].clientY)
+                }
             }
         }
     }
@@ -231,16 +235,16 @@ class Tools {
             return this.Skip
         }
 
-        static start(event) {
-            super.start(event)
+        static start(event, mobile) {
+            super.start(event, mobile)
             this.element = new this.Element(
                 [this.startPoint, this.startPoint],
                 this.thickness,
                 this.color
             )
         }
-        static update(event) {
-            event = this.Point.fromEvent(event)
+        static update(event, mobile) {
+            event = this.Point.fromEvent(event, mobile)
             const skipped = Math.sqrt(Math.abs(event.x - this.startX)+Math.abs(event.y - this.startY))
             if (skipped >= this.skip) {
                 this.element.points.push(this.Point.fromEvent(event))
@@ -272,40 +276,30 @@ class Tools {
         }
     }
     static LineTool = Tools.Tool
-    static ShapeTool = class extends Tools.Tool {
-        static name = "shapetool"
-        static Shape = class {
-            static rectangle = "rectangle"
-            static square = "square"
-            static ellipse = "ellipse"
-            static circle = "circle"
-        }
-        static defaultShape = this.Shape.rectangle
-        static set shape(value) { this._shape = value }
-        static get shape() {
-            if (this._shape == null) {
-                return this.defaultShape
-            }
-            return this._shape
-        }
+    static SquareTool = class extends Tools.Tool {
+        static name = "squaretool"
 
-        static update(event) {
-            event = this.Point.fromEvent(event)
+        static update(event, mobile) {
+            let PressedShift = pressedShift
+            if (mobile) {
+                PressedShift = event.touches.length > 1
+            }
+            event = this.Point.fromEvent(event, mobile)
             clearCanvas(previewContext)
             this.element = new this.Element(
                 [this.startPoint, event],
                 this.thickness,
                 this.color,
-                pressedShift ? (this.shape === this.Shape.rectangle ? this.Shape.square : this.Shape.circle) : this.shape
+                PressedShift
             )
             this.element.draw(previewContext)
         }
         static Element = class {
-            constructor(points, thickness, color, shape) {
+            constructor(points, thickness, color, square) {
                 this.points = points
                 this.thickness = thickness
                 this.color = color
-                this.shape = shape
+                this.square = square
             }
             draw(context) {
                 const startPoint = this.points[0]
@@ -314,7 +308,48 @@ class Tools {
                 context.strokeStyle = this.color.rgba
                 context.lineWidth = this.thickness
                 context.lineCap = "round"
-                if (this.shape === Tools.ShapeTool.Shape.circle) {
+                if (this.square) {
+                    const size = Math.abs(endPoint.x - startPoint.x)
+                    if (endPoint.y < startPoint.y) {
+                        if (endPoint.x < startPoint.x) {
+                            context.rect(startPoint.x, startPoint.y, -size, -size)
+                        } else {
+                            context.rect(endPoint.x, startPoint.y, -size, -size)
+                        }
+                    } else {
+                        if (endPoint.x < startPoint.x) {
+                            context.rect(endPoint.x, startPoint.y, size, size)
+                        } else {
+                            context.rect(startPoint.x, startPoint.y, size, size)
+                        }
+                    }
+                } else {
+                    const sizeX = endPoint.x - startPoint.x
+                    const sizeY = endPoint.y - startPoint.y
+                    context.rect(startPoint.x, startPoint.y, sizeX, sizeY)
+                }
+                context.stroke()
+            }
+        }
+    }
+    static CircleTool = class extends Tools.SquareTool {
+        static name = "circle"
+
+        static Element = class {
+            constructor(points, thickness, color, circle) {
+                this.points = points
+                this.thickness = thickness
+                this.color = color
+                this.circle = circle
+            }
+            draw(context) {
+                const startPoint = this.points[0]
+                const endPoint = this.points[1]
+                context.beginPath()
+                context.strokeStyle = this.color.rgba
+                context.lineWidth = this.thickness
+                context.lineCap = "round"
+                if (this.circle) {
                         const radius = Math.abs((endPoint.x - startPoint.x) / 2)
                         if (endPoint.y < startPoint.y) {
                             if (endPoint.x < startPoint.x) {
@@ -341,7 +376,7 @@ class Tools {
                                 )
                             }
                         }
-                } else if (this.shape === Tools.ShapeTool.Shape.ellipse) {
+                } else {
                     const radiusX = (endPoint.x - startPoint.x) / 2
                     const radiusY = (endPoint.y - startPoint.y) / 2
                     context.ellipse(
@@ -350,25 +385,6 @@ class Tools {
                         Math.abs(radiusX), Math.abs(radiusY),
                         0, 2*Math.PI, false
                     );
-                } else if (this.shape === Tools.ShapeTool.Shape.square) {
-                    const size = Math.abs(endPoint.x - startPoint.x)
-                    if (endPoint.y < startPoint.y) {
-                        if (endPoint.x < startPoint.x) {
-                            context.rect(startPoint.x, startPoint.y, -size, -size)
-                        } else {
-                            context.rect(endPoint.x, startPoint.y, -size, -size)
-                        }
-                    } else {
-                        if (endPoint.x < startPoint.x) {
-                            context.rect(endPoint.x, startPoint.y, size, size)
-                        } else {
-                            context.rect(startPoint.x, startPoint.y, size, size)
-                        }
-                    }
-                } else if (this.shape === Tools.ShapeTool.Shape.rectangle) {
-                    const sizeX = endPoint.x - startPoint.x
-                    const sizeY = endPoint.y - startPoint.y
-                    context.rect(startPoint.x, startPoint.y, sizeX, sizeY)
                 }
                 context.stroke()
             }
