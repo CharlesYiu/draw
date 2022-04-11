@@ -50,91 +50,62 @@ const advancedSettings = document.getElementById("settings-advanced")
 const showAdvanced = document.getElementById("settings-showadvanced")
 showAdvanced.onclick = function() {
     advancedSettings.hidden = !advancedSettings.hidden
-    showAdvanced.textContent = advancedSettings.hidden ? "Show Advanced" : "Hide Advanced"
+    showAdvanced.textContent = advancedSettings.hidden ? "Show Settings" : "Hide Settings"
 }
 // Tools
-const scribbleTool = document.getElementById("settings-tools-scribbletool")
+const pencilTool = document.getElementById("settings-tools-penciltool")
 const lineTool = document.getElementById("settings-tools-linetool")
 const squareTool = document.getElementById("settings-tools-squaretool")
 const circleTool = document.getElementById("settings-tools-circletool")
-scribbleTool.onclick = function() {
-    Tools.currentTool = Tools.ScribbleTool
-    lineTool.classList.remove("highlighted")
-    squareTool.classList.remove("highlighted")
-    circleTool.classList.remove("hightlighted")
-    scribbleTool.classList.add("highlighted")
-    updateToolThickness()
-    updateToolColor()
+pencilTool.onclick = function() {
+    Tools.selected = Tools.PencilTool
+    updateTool()
 }
 lineTool.onclick = function() {
-    Tools.currentTool = Tools.LineTool
-    squareTool.classList.remove("highlighted")
-    scribbleTool.classList.remove("highlighted")
-    circleTool.classList.remove("hightlighted")
-    lineTool.classList.add("highlighted")
-    updateToolThickness()
-    updateToolColor()
+    Tools.selected = Tools.LineTool
+    updateTool()
 }
 squareTool.onclick = function() {
-    Tools.currentTool = Tools.SquareTool
-    lineTool.classList.remove("highlighted")
-    scribbleTool.classList.remove("highlighted")
-    circleTool.classList.remove("hightlighted")
-    squareTool.classList.add("highlighted")
-    updateToolThickness()
-    updateToolColor()
+    Tools.selected = Tools.SquareTool
+    updateTool()
 }
 circleTool.onclick = function() {
-    Tools.currentTool = Tools.CircleTool
-    lineTool.classList.remove("highlighted")
-    scribbleTool.classList.remove("highlighted")
-    squareTool.classList.remove("hightlighted")
-    circleTool.classList.add("highlighted")
-    updateToolThickness()
-    updateToolColor()
+    Tools.selected = Tools.CircleTool
+    updateTool()
 }
 // Color
 const colorPicker = document.getElementById("settings-linecolor-value")
 const alphaSlider = document.getElementById("settings-linecolor-avalue")
-function updateToolColor() {
-    const color = Tools.currentTool.color
-    colorPicker.value = color.hex
-    alphaSlider.valueAsNumber = color.alpha * 100
-}
 colorPicker.oninput = function() {
     const hex = colorPicker.value
-    Tools.currentTool.color.hex = hex
-    const color = Tools.currentTool.color
-    const name = Tools.currentTool.name
+    Tools.selected.color.hex = hex
+    const color = Tools.selected.color
+    const name = Tools.selected.name
     localStorage.setItem(name+"-hex", color.hex)
 }
 alphaSlider.oninput = function() {
-    const color = Tools.currentTool.color
+    const color = Tools.selected.color
     color.alpha = alphaSlider.valueAsNumber / 100
-    const name = Tools.currentTool.name
+    const name = Tools.selected.name
     localStorage.setItem(name+"-alpha", alphaSlider.valueAsNumber.toString())
 }
 
 // Cursor
 const toggleCursor = document.getElementById("settings-advanced-cursor")
 toggleCursor.onclick = function() {
-    useCursor = !useCursor
-    setUseCursor()
-    localStorage.setItem("cursor", useCursor.toString())
+    Cursor.use = !Cursor.use
+    localStorage.setItem("cursor", Cursor.use.toString())
 }
 // Thickness input
 const thicknessInput = document.getElementById("settings-linewidth-value")
-function updateToolThickness() {
-    thicknessInput.valueAsNumber = Tools.currentTool.thickness
-}
 thicknessInput.onblur = function() {
     if (thicknessInput.valueAsNumber > 250) {
         thicknessInput.valueAsNumber = 250
     } else if (thicknessInput.valueAsNumber < 1) {
         thicknessInput.valueAsNumber = 1
     }
-    Tools.currentTool.thickness = thicknessInput.valueAsNumber
-    localStorage.setItem(Tools.currentTool.name+"-thickness", thicknessInput.value)
+    Tools.selected.thickness = thicknessInput.valueAsNumber
+    localStorage.setItem(Tools.selected.name+"-thickness", thicknessInput.value)
 }
 
 // thickness buttons
@@ -145,8 +116,8 @@ holdAction(
         } else {
             thicknessInput.valueAsNumber = 250
         }
-        Tools.currentTool.thickness = thicknessInput.valueAsNumber
-        const name = Tools.currentTool.name
+        Tools.selected.thickness = thicknessInput.valueAsNumber
+        const name = Tools.selected.name
         localStorage.setItem(name+"-thickness", thicknessInput.value)
     },
     document.getElementById("settings-linewidth-add")
@@ -158,8 +129,8 @@ holdAction(
         } else {
             thicknessInput.valueAsNumber = 1
         }
-        Tools.currentTool.thickness = thicknessInput.valueAsNumber
-        const name = Tools.currentTool.name
+        Tools.selected.thickness = thicknessInput.valueAsNumber
+        const name = Tools.selected.name
         localStorage.setItem(name+"-thickness", thicknessInput.value)
     },
     document.getElementById("settings-linewidth-minus")
@@ -171,7 +142,7 @@ holdAction(
     function() {
         if (element = elements.pop()) {
             removedElements.push(element)
-            redrawElements(context)
+            redrawElements(context, elements)
         }
     },
     document.getElementById("settings-undoredo-undo")
@@ -180,7 +151,7 @@ holdAction(
     function() {
         if (removedElement = removedElements.pop()) {
             elements.push(removedElement)
-            redrawElements(context)
+            redrawElements(context, elements)
         }
     },
     document.getElementById("settings-undoredo-redo")
@@ -207,6 +178,26 @@ function clearCanvasAction() {
 }
 clearCanvasButton.onclick = clearCanvasComfirm
 
+function updateTool() {
+    lineTool.classList.remove("highlighted")
+    pencilTool.classList.remove("highlighted")
+    squareTool.classList.remove("highlighted")
+    circleTool.classList.remove("highlighted")
+    if (Tools.selected === Tools.LineTool) {
+        lineTool.classList.add("highlighted")
+    } else if (Tools.selected === Tools.PencilTool) {
+        pencilTool.classList.add("highlighted")
+    } else if (Tools.selected === Tools.SquareTool) {
+        squareTool.classList.add("highlighted")
+    } else if (Tools.selected === Tools.CircleTool) {
+        circleTool.classList.add("highlighted")
+    }
+    const color = Tools.selected.color
+    colorPicker.value = color.hex
+    alphaSlider.valueAsNumber = color.alpha * 100
+    thicknessInput.valueAsNumber = Tools.selected.thickness
+}
+
 function loadSettings() {
     if (newHex = localStorage.getItem("linetool-hex")) {
         Tools.LineTool.color = Color.fromHex(newHex)
@@ -217,14 +208,14 @@ function loadSettings() {
     if (newThickness = localStorage.getItem("linetool-thickness")) {
         Tools.LineTool.thickness = parseInt(newThickness, 10)
     }
-    if (newHex = localStorage.getItem("scribbletool-hex")) {
-        Tools.ScribbleTool.color = Color.fromHex(newHex)
+    if (newHex = localStorage.getItem("penciltool-hex")) {
+        Tools.PencilTool.color = Color.fromHex(newHex)
     }
-    if (newAlpha = localStorage.getItem("scribbletool-alpha")) {
-        Tools.ScribbleTool.color.alpha = parseInt(newAlpha, 10) / 100
+    if (newAlpha = localStorage.getItem("penciltool-alpha")) {
+        Tools.PencilTool.color.alpha = parseInt(newAlpha, 10) / 100
     }
-    if (newThickness = localStorage.getItem("scribbletool-thickness")) {
-        Tools.ScribbleTool.thickness = parseInt(newThickness, 10)
+    if (newThickness = localStorage.getItem("penciltool-thickness")) {
+        Tools.PencilTool.thickness = parseInt(newThickness, 10)
     }
     if (newHex = localStorage.getItem("squaretool-hex")) {
         Tools.SquareTool.color = Color.fromHex(newHex)
@@ -244,11 +235,10 @@ function loadSettings() {
     if (newThickness = localStorage.getItem("circletool-thickness")) {
         Tools.CircleTool.thickness = parseInt(newThickness, 10)
     }
-    updateToolThickness()
-    updateToolColor()
+    updateTool()
+    Cursor.use = true
     if (newUseCursor = localStorage.getItem("cursor")) {
-        useCursor = newUseCursor === "true" ? true : false
-        setUseCursor()
+        Cursor.use = newUseCursor === "true" ? true : false
     }
 }
 loadSettings()

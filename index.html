@@ -7,11 +7,9 @@
     <title>Draw Rewrite</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <canvas id="canvas"></canvas>
-    <canvas id="previewCanvas"></canvas> 
-    <canvas id="previewPreviewCanvas"></canvas> 
-    <div id="cursor">
+<body id="app">
+    <canvas id="canvas" class="canvas"></canvas>
+    <div id="cursor" hidden>
         <div id="cursor-dot"></div>
     </div>
     <div id="overlay">
@@ -32,7 +30,7 @@
             </div>
             <div id="settings-tools" class="subsettings">
                 <p id="settings-tools-header" class="subsettings-header">Tool:</p>
-                <button id="settings-tools-scribbletool" class="doublebuttons highlighted">Scribble</button>
+                <button id="settings-tools-penciltool" class="doublebuttons highlighted">Pencil</button>
                 <button id="settings-tools-linetool" class="doublebuttons">Line</button>
                 <button id="settings-tools-squaretool" class="doublebuttons">Square</button>
                 <button id="settings-tools-circletool" class="doublebuttons">Circle</button>
@@ -42,16 +40,15 @@
                 <button id="settings-undoredo-redo" class="doublebuttons">Redo</button>
             </div>
             <button id="settings-clear" class="singlebutton">Clear Canvas</button>
-            <button id="settings-showadvanced" class="singlebutton">Show Advanced</button>
+            <button id="settings-showadvanced" class="singlebutton">Show Settings</button>
             <div id="settings-advanced" class="subsettings" hidden>
-                <p id="settings-advanced-header" class="subsettings-header">Advanced:</p>
+                <p id="settings-advanced-header" class="subsettings-header">Settings:</p>
                 <button id="settings-advanced-cursor" class="singlebutton">Use Default Cursor</button>
-                <button id="settings-advanced-forcemobile" class="singlebutton">Force Mobile</button>
             </div>
         </div>
     </div>
-    <script src="cursor.js"></script>
     <script src="tools.js"></script>
+    <script src="cursor.js"></script>
     <script src="overlay.js"></script>
     <script src="script.js"></script>
 </body>

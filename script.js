@@ -1,4 +1,3 @@
-// TODO Add keyboard shortcuts for changing the settings quickly
 // TODO Implement export as image button
 // TODO Implement save as project button
 let pressedShift = false
@@ -11,6 +10,22 @@ window.onkeydown = function() {
     } else if (key === "Escape") {
         settings.style.opacity = settings.style.opacity === "0.25" ? "1" : "0.25"
         transparentSettings = settings.style.opacity === "0.25"
+    } else if (key === "l") {
+        Tools.selected = Tools.LineTool
+        updateTool()
+    } else if (key === "p") {
+        Tools.selected = Tools.PencilTool
+        updateTool()
+    } else if (key === "r") {
+        Tools.selected = Tools.SquareTool
+        updateTool()
+    } else if (key === "e") {
+        Tools.selected = Tools.CircleTool
+        updateTool()
+    } else if (key === "=") {
+        thicknessInput.valueAsNumber += 1
+    } else if (key === "-") {
+        thicknessInput.valueAsNumber -= 1
     }
 }
 window.onkeyup = function() {
@@ -20,28 +35,12 @@ window.onkeyup = function() {
     }
 }
 
-window.onload = () => {
-    let cursorDown = false
-    onStart(canvas, function(mobile) {
-        settings.style.opacity = "0.25"
-        Tools.currentTool.start(window.event, mobile)
-        cursorDown = true
-    })
-    onEnd(window, function(mobile) {
-        if (cursorDown) {
-            cursorDown = false
-            if (!transparentSettings) {
-                settings.style.opacity = "1"
-            }
-            Tools.currentTool.stop(window.event, mobile)
-        }
-    })
-    onMove(window, function(mobile) {
-        if (useCursor) {
-            updateCursor()
-        }
-        if (cursorDown) {
-            Tools.currentTool.update(window.event, mobile)
-        }
-    })
-}
+Tools.Handle()
+window.addEventListener("mousedown", function() {
+    settings.style.opacity = "0.25"
+})
+window.addEventListener("mouseup", function() {
+    if (!transparentSettings) {
+        settings.style.opacity = "1"
+    }
+})

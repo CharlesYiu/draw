@@ -1,40 +1,46 @@
-let useCursor = true
-function updateCursor() {
-    const cursorPosition = [window.event]
-    if (cursorPosition[0] === undefined) { return }
+class Cursor {
+    static element = document.getElementById("cursor")
+    static childElement = document.getElementById("cursor-dot")
+    static _update(event) {
+        Cursor.element.hidden = false
+        
+        const dividedThickness = Tools.selected.thickness / 2
+        const cursorElementSize = `${Tools.selected.thickness + 2}px`
+        Cursor.element.style.width = cursorElementSize
+        Cursor.element.style.height = cursorElementSize
+    
+        const leftStyle = `${(Math.round(event.clientX - dividedThickness - 2))}px`
+        const topStyle = `${(Math.round(event.clientY - dividedThickness - 2))}px`
+        Cursor.element.style.left = leftStyle
+        Cursor.element.style.top = topStyle
+    
+        const cursorDotElementOffset = `${dividedThickness - 1}px`
+        Cursor.childElement.style.left = cursorDotElementOffset
+        Cursor.childElement.style.top = cursorDotElementOffset
+    
+        setTimeout(() => {
+            if (Cursor.element.style.left == leftStyle && Cursor.element.style.top == topStyle) {
+                Cursor.element.hidden = true
+            }
+        }, 2500)
+    }
+    static _use = false
+    static get use() { return this._use }
+    static set use(value) {
+        if (this._use == value) { return }
 
-    const cursorElement = document.getElementById("cursor")
-    const cursorDotElement = document.getElementById("cursor-dot")
+        if (!value) {
+            this.element.hidden = true
+            canvas.style.cursor = "pointer"
+            toggleCursor.textContent = "Use Custom Cursor"
 
-    cursorElement.hidden = false
+            window.removeEventListener("mousemove", this._update)
+        } else {
+            canvas.style.cursor = "none"
+            toggleCursor.textContent = "Use Default Cursor"
 
-    const dividedThickness = Tools.currentTool.thickness / 2
-    const cursorElementSize = `${Tools.currentTool.thickness + 2}px`
-    cursorElement.style.width = cursorElementSize
-    cursorElement.style.height = cursorElementSize
-
-    const leftStyle = `${(Math.round(cursorPosition[0].clientX - dividedThickness - 2))}px`
-    const topStyle = `${(Math.round(cursorPosition[0].clientY - dividedThickness - 2))}px`
-    cursorElement.style.left = leftStyle
-    cursorElement.style.top = topStyle
-
-    const cursorDotElementOffset = `${dividedThickness - 1}px`
-    cursorDotElement.style.left = cursorDotElementOffset
-    cursorDotElement.style.top = cursorDotElementOffset
-
-    setTimeout(() => {
-        if (cursorElement.style.left == leftStyle && cursorElement.style.top == topStyle) { cursorElement.hidden = true }
-    }, 2500)
-}
-function setUseCursor() {
-    const cursorElement = document.getElementById("cursor")
-    if (!useCursor) {
-        cursorElement.hidden = true
-        previewPreviewCanvas.style.cursor = "default"
-        toggleCursor.textContent = "Use Custom Cursor"
-    } else {
-        cursorElement.hidden = false
-        previewPreviewCanvas.style.cursor = "none"
-        toggleCursor.textContent = "Use Default Cursor"
+            window.addEventListener("mousemove", this._update)
+        }
+        this._use = value
     }
 }

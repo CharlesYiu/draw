@@ -1,30 +1,26 @@
-const canvas = document.getElementById("canvas")
-const context = canvas.getContext("2d")
-const previewCanvas = document.getElementById("previewCanvas")
-const previewContext = previewCanvas.getContext("2d")
-
 function clearCanvas(context) {
     const canvas = context.canvas
     context.clearRect(0, 0, canvas.width, canvas.height)
 }
-function resizeCanvas() {
-    canvas.width  = window.innerWidth
-    canvas.height = window.innerHeight
-    previewCanvas.width  = window.innerWidth
-    previewCanvas.height = window.innerHeight
+function resizeCanvas(context) {
+    context.canvas.width  = window.innerWidth
+    context.canvas.height = window.innerHeight
 }
 let elements = []
-function redrawElements(context) {
+function redrawElements(context, elements) {
     clearCanvas(context)
     elements.forEach(function(element) {
         element.draw(context)
     })
 }
-window.onresize = function() {
-    resizeCanvas()
-    redrawElements(context)
-}
-resizeCanvas()
+
+const canvas = document.getElementById("canvas")
+const context = canvas.getContext("2d")
+window.addEventListener("resize", function() {
+    resizeCanvas(context)
+    redrawElements(context, elements)
+})
+resizeCanvas(context)
 
 class Color {
     static White = new Color(255, 255, 255, 1)
@@ -147,8 +143,100 @@ class Color {
         return color
     }
 }
-
+function randomId(prefix = "")
+{
+    return Math.random().toString(36).replace('0.',prefix || '');
+}
 class Tools {
+    static context = null
+    static Handle(element) {
+        let pointers = []
+        canvas.addEventListener("touchstart", function(event) {
+            event.preventDefault()
+            for(let index = 0; index < event.touches.length; index++) {
+                const touch = event.touches[index]
+                if (!pointers.some(pointer => pointer.identifier === touch.identifier)) {
+                    const pointerIndex = pointers.push({
+                        tool: new Tools.selected(),
+                        identifier: touch.identifier,
+                        event: event
+                    }) - 1
+                    pointers[pointerIndex].tool.start(event, false)
+                }
+            }
+        })
+        canvas.addEventListener("touchmove", function(event) {
+            event.preventDefault()
+            for(let index = 0; index < event.touches.length; index++) {
+                const touch = event.touches[index]
+                for(let index = 0; index < pointers.length; index++) {
+                    const pointer = pointers[index]
+                    if (pointer.identifier === touch.identifier) {
+                        pointer.event = touch
+                        pointer.tool.update(touch, true)
+                        break
+                    }
+                }
+            }
+        })
+        canvas.addEventListener("touchend", function(event) {
+            event.preventDefault()
+            pointers.forEach(function(pointer) {
+                let hasEnded = true
+                for(let index = 0; index < event.touches.length; index++) {
+                    const touch = event.touches[index]
+                    if (touch.identifier == pointer.identifier) {
+                        hasEnded = false
+                        break
+                    }
+                }
+                if (hasEnded) {
+                    pointer.tool.stop(pointer.event, true)
+                    pointers.splice(pointers.indexOf(pointer))
+                }
+            })
+        })
+        let mouseDown = false
+        canvas.addEventListener("mousedown", function(event) {
+            mouseDown = true
+            const pointerIndex = pointers.push({
+                tool: new Tools.selected(),
+                identifier: "mouse",
+                event: event
+            }) - 1
+            pointers[pointerIndex].tool.start(event, false)
+        })
+        canvas.addEventListener("mousemove", function(event) {
+            if (!mouseDown) { return }
+            pointers.some(function(pointer) {
+                if (pointer.identifier == "mouse") {
+                    pointer.tool.update(event, false)
+                    return true
+                }
+                return false
+            })
+        })
+        canvas.addEventListener("mouseup", function(event) {
+            mouseDown = false
+            pointers.some(function(pointer) {
+                if (pointer.identifier == "mouse") {
+                    pointer.tool.stop(event, false)
+                    pointers.splice(pointers.indexOf(pointer))
+                    return true
+                }
+                return false
+            })
+        })
+    }
+    static Point = class {
+        constructor(x, y) {
+            this.x = x
+            this.y = y
+        }
+        static fromEvent(event) {
+            return new this(event.clientX, event.clientY)
+        }
+    }
     static Tool = class {
         static name = "linetool"
         static defaultThickness = 10
@@ -167,29 +255,46 @@ class Tools {
             }
             return this._color
         }
-    
-        static startPoint = null
-        static element = null
-        
-        static start(event, mobile) {
-            event = this.Point.fromEvent(event, mobile)
+
+        startPoint = null
+        element = null
+        previewContext = null
+
+        onResize() {
+            resizeCanvas(this.previewContext)
+            redrawElements(this.previewContext, [this.element])
+        }
+        start(event, mobile) {
+            const previewCanvas = document.createElement("canvas")
+            previewCanvas.id = randomId("preview-")
+            previewCanvas.classList.add("previewCanvas")
+            document.body.insertBefore(previewCanvas, Cursor.element)
+
+            this.previewContext = previewCanvas.getContext("2d")
+
+            window.addEventListener("resize", this.onResize)
+            resizeCanvas(this.previewContext)
+
+            event = Tools.Point.fromEvent(event)
             this.startPoint = event
         }
-        static stop(event, mobile) {
+        stop(event, mobile) {
             this.element.draw(context)
             elements.push(this.element)
             this.element = null
-            clearCanvas(previewContext)
+
+            this.previewContext.canvas.remove()
+            window.removeEventListener("resize", this.onResize)
         }
-        static update(event, mobile) {
-            event = this.Point.fromEvent(event, mobile)
-            clearCanvas(previewContext)
-            this.element = new this.Element(
+        update(event, mobile) {
+            event = Tools.Point.fromEvent(event)
+            clearCanvas(this.previewContext)
+            this.element = new Tools.Tool.Element(
                 [this.startPoint, event],
-                this.thickness,
-                this.color
+                Tools.Tool.thickness,
+                Tools.Tool.color
             )
-            this.element.draw(previewContext)
+            this.element.draw(this.previewContext)
         }
         static Element = class {
             constructor(points, thickness, color) {
@@ -210,22 +315,9 @@ class Tools {
                 context.stroke()
             }
         }
-        static Point = class {
-            constructor(x, y) {
-                this.x = x
-                this.y = y
-            }
-            static fromEvent(event, mobile) {
-                if (!mobile) {
-                    return new this(event.clientX, event.clientY)
-                } else {
-                    return new this(event.touches[0].clientX, event.touches[0].clientY)
-                }
-            }
-        }
     }
-    static ScribbleTool = class extends Tools.Tool {
-        static name = "scribbletool"
+    static PencilTool = class extends Tools.Tool {
+        static name = "penciltool"
         static defaultSkip = 3
         static set skip(value) { this.Skip = value }
         static get skip() {
@@ -235,23 +327,23 @@ class Tools {
             return this.Skip
         }
 
-        static start(event, mobile) {
+        start(event, mobile) {
             super.start(event, mobile)
-            this.element = new this.Element(
+            this.element = new Tools.PencilTool.Element(
                 [this.startPoint, this.startPoint],
-                this.thickness,
-                this.color
+                Tools.PencilTool.thickness,
+                Tools.PencilTool.color
             )
         }
-        static update(event, mobile) {
-            event = this.Point.fromEvent(event, mobile)
+        update(event, mobile) {
+            event = Tools.Point.fromEvent(event)
             const skipped = Math.sqrt(Math.abs(event.x - this.startX)+Math.abs(event.y - this.startY))
             if (skipped >= this.skip) {
-                this.element.points.push(this.Point.fromEvent(event))
+                this.element.points.push(Tools.Point.fromEvent(event))
             } else {
-                clearCanvas(previewContext)
+                clearCanvas(this.previewContext)
                 this.element.points[this.element.points.length] = event
-                this.element.draw(previewContext)
+                this.element.draw(this.previewContext)
             }
         }
         static Element = class {
@@ -279,20 +371,20 @@ class Tools {
     static SquareTool = class extends Tools.Tool {
         static name = "squaretool"
 
-        static update(event, mobile) {
+        update(event, mobile) {
             let PressedShift = pressedShift
             if (mobile) {
                 PressedShift = event.touches.length > 1
             }
-            event = this.Point.fromEvent(event, mobile)
-            clearCanvas(previewContext)
-            this.element = new this.Element(
+            event = Tools.Point.fromEvent(event, mobile)
+            clearCanvas(this.previewContext)
+            this.element = new Tools.SquareTool.Element(
                 [this.startPoint, event],
-                this.thickness,
-                this.color,
+                Tools.SquareTool.thickness,
+                Tools.SquareTool.color,
                 PressedShift
             )
-            this.element.draw(previewContext)
+            this.element.draw(this.previewContext)
         }
         static Element = class {
             constructor(points, thickness, color, square) {
@@ -335,6 +427,22 @@ class Tools {
     static CircleTool = class extends Tools.SquareTool {
         static name = "circle"
 
+        update(event, mobile) {
+            let PressedShift = pressedShift
+            if (mobile) {
+                PressedShift = event.touches.length > 1
+            }
+            event = Tools.Point.fromEvent(event, mobile)
+            clearCanvas(this.previewContext)
+            this.element = new Tools.CircleTool.Element(
+                [this.startPoint, event],
+                Tools.CircleTool.thickness,
+                Tools.CircleTool.color,
+                PressedShift
+            )
+            this.element.draw(this.previewContext)
+        }
+
         static Element = class {
             constructor(points, thickness, color, circle) {
                 this.points = points
@@ -342,7 +450,7 @@ class Tools {
                 this.color = color
                 this.circle = circle
             }
-            draw(context) {
+            draw(context, mobile) {
                 const startPoint = this.points[0]
                 const endPoint = this.points[1]
                 context.beginPath()
@@ -390,12 +498,12 @@ class Tools {
             }
         }
     }
-    static defaultTool = Tools.ScribbleTool
-    static set currentTool(value) { Tools._currentTool = value }
-    static get currentTool() {
-        if (Tools._currentTool == null) {
-            return Tools.defaultTool
+    static defaultTool = Tools.PencilTool
+    static set selected(value) { this._selected = value }
+    static get selected() {
+        if (this._selected == null) {
+            return this.defaultTool
         }
-        return Tools._currentTool
+        return this._selected
     }
 }

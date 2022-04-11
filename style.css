@@ -18,15 +18,9 @@ body, html {
     user-select: none;
 }
 /* Canvas */
-#canvas, #previewCanvas, #previewPreviewCanvas {
-    position: fixed;
-}
-#canvas {
-    background-color: white;
-}
-#previewCanvas, #previewPreviewCanvas {
-    pointer-events: none;
-}
+#canvas, .previewCanvas { position: absolute; }
+#canvas { background-color: white; }
+.previewCanvas { pointer-events: none; }
 /* Settings */
 #settings {
     position: fixed;
@@ -65,7 +59,7 @@ body, html {
 }
 #settings-clear { margin-top: 10px; }
 #settings-linewidth-add, #settings-linewidth-minus { margin-top: -10px; }
-#settings-tools-linetool, #settings-advanced-forcemobile { margin-top: 2.5%; }
+#settings-tools-linetool { margin-top: 2.5%; }
 #settings-linecolor { position: relative; }
 #settings-showadvanced, #settings-clear { margin-top: 10px; }
 #settings-tools-squaretool, #settings-tools-circletool {
@@ -81,6 +75,7 @@ body, html {
     padding-bottom: 5px;
     text-align: center;
     cursor: pointer;
+    color: black;
 }
 .highlighted {
     background-color: rgb(190, 190, 190);
@@ -203,7 +198,6 @@ input:focus {
     border: none;
     border-radius: 4px;
 }
-
 /* Cursor */
 #cursor {
     position: fixed;
