@@ -19,9 +19,12 @@ window.onkeydown = function() {
     } else if (key === "r") {
         Tools.selected = Tools.SquareTool
         updateTool()
-    } else if (key === "e") {
+    } else if (key === "c") {
         Tools.selected = Tools.CircleTool
         updateTool()
+    // } else if (key === "e") {
+    //     Tools.selected = Tools.EraseTool
+    //     updateTool()
     } else if (key === "=") {
         thicknessInput.valueAsNumber += 1
     } else if (key === "-") {
@@ -35,11 +38,11 @@ window.onkeyup = function() {
     }
 }
 
-Tools.Handle()
-window.addEventListener("mousedown", function() {
+window.addEventListener("load", Tools.Handle)
+canvas.addEventListener("mousedown", function() {
     settings.style.opacity = "0.25"
 })
-window.addEventListener("mouseup", function() {
+canvas.addEventListener("mouseup", function() {
     if (!transparentSettings) {
         settings.style.opacity = "1"
     }

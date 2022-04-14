@@ -62,7 +62,7 @@ body, html {
 #settings-tools-linetool { margin-top: 2.5%; }
 #settings-linecolor { position: relative; }
 #settings-showadvanced, #settings-clear { margin-top: 10px; }
-#settings-tools-squaretool, #settings-tools-circletool {
+#settings-tools-squaretool, #settings-tools-circletool, #settings-tools-erasetool, #settings-tools-colortool {
     margin-top: 5px;
 }
 /* Buttons in general */

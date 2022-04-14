@@ -3,7 +3,7 @@ class Cursor {
     static childElement = document.getElementById("cursor-dot")
     static _update(event) {
         Cursor.element.hidden = false
-        
+
         const dividedThickness = Tools.selected.thickness / 2
         const cursorElementSize = `${Tools.selected.thickness + 2}px`
         Cursor.element.style.width = cursorElementSize

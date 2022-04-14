@@ -148,8 +148,7 @@ function randomId(prefix = "")
     return Math.random().toString(36).replace('0.',prefix || '');
 }
 class Tools {
-    static context = null
-    static Handle(element) {
+    static Handle() {
         let pointers = []
         canvas.addEventListener("touchstart", function(event) {
             event.preventDefault()
@@ -239,6 +238,7 @@ class Tools {
     }
     static Tool = class {
         static name = "linetool"
+        name = "linetool"
         static defaultThickness = 10
         static defaultColor = Color.Black
         static set thickness(value) { this._thickness = value }
@@ -255,6 +255,7 @@ class Tools {
             }
             return this._color
         }
+        get tool() { return Tools.fromName(this.name) }
 
         startPoint = null
         element = null
@@ -283,16 +284,16 @@ class Tools {
             elements.push(this.element)
             this.element = null
 
-            this.previewContext.canvas.remove()
+            document.body.removeChild(this.previewContext.canvas)
             window.removeEventListener("resize", this.onResize)
         }
         update(event, mobile) {
             event = Tools.Point.fromEvent(event)
             clearCanvas(this.previewContext)
-            this.element = new Tools.Tool.Element(
+            this.element = new this.tool.Element(
                 [this.startPoint, event],
-                Tools.Tool.thickness,
-                Tools.Tool.color
+                this.tool.thickness,
+                this.tool.color
             )
             this.element.draw(this.previewContext)
         }
@@ -318,6 +319,7 @@ class Tools {
     }
     static PencilTool = class extends Tools.Tool {
         static name = "penciltool"
+        name = "penciltool"
         static defaultSkip = 3
         static set skip(value) { this.Skip = value }
         static get skip() {
@@ -329,10 +331,10 @@ class Tools {
 
         start(event, mobile) {
             super.start(event, mobile)
-            this.element = new Tools.PencilTool.Element(
+            this.element = new this.tool.Element(
                 [this.startPoint, this.startPoint],
-                Tools.PencilTool.thickness,
-                Tools.PencilTool.color
+                this.tool.thickness,
+                this.tool.color
             )
         }
         update(event, mobile) {
@@ -370,6 +372,7 @@ class Tools {
     static LineTool = Tools.Tool
     static SquareTool = class extends Tools.Tool {
         static name = "squaretool"
+        name = "squaretool"
 
         update(event, mobile) {
             let PressedShift = pressedShift
@@ -378,20 +381,20 @@ class Tools {
             }
             event = Tools.Point.fromEvent(event, mobile)
             clearCanvas(this.previewContext)
-            this.element = new Tools.SquareTool.Element(
+            this.element = new this.tool.Element(
                 [this.startPoint, event],
-                Tools.SquareTool.thickness,
-                Tools.SquareTool.color,
+                this.tool.thickness,
+                this.tool.color,
                 PressedShift
             )
             this.element.draw(this.previewContext)
         }
         static Element = class {
-            constructor(points, thickness, color, square) {
+            constructor(points, thickness, color, equalWidth) {
                 this.points = points
                 this.thickness = thickness
                 this.color = color
-                this.square = square
+                this.equalWidth = this.equalWidth
             }
             draw(context) {
                 const startPoint = this.points[0]
@@ -425,31 +428,10 @@ class Tools {
         }
     }
     static CircleTool = class extends Tools.SquareTool {
-        static name = "circle"
+        static name = "circletool"
+        name = "circletool"
 
-        update(event, mobile) {
-            let PressedShift = pressedShift
-            if (mobile) {
-                PressedShift = event.touches.length > 1
-            }
-            event = Tools.Point.fromEvent(event, mobile)
-            clearCanvas(this.previewContext)
-            this.element = new Tools.CircleTool.Element(
-                [this.startPoint, event],
-                Tools.CircleTool.thickness,
-                Tools.CircleTool.color,
-                PressedShift
-            )
-            this.element.draw(this.previewContext)
-        }
-
-        static Element = class {
-            constructor(points, thickness, color, circle) {
-                this.points = points
-                this.thickness = thickness
-                this.color = color
-                this.circle = circle
-            }
+        static Element = class extends Tools.SquareTool.Element {
             draw(context, mobile) {
                 const startPoint = this.points[0]
                 const endPoint = this.points[1]
@@ -457,7 +439,7 @@ class Tools {
                 context.strokeStyle = this.color.rgba
                 context.lineWidth = this.thickness
                 context.lineCap = "round"
-                if (this.circle) {
+                if (this.equalWidth) {
                         const radius = Math.abs((endPoint.x - startPoint.x) / 2)
                         if (endPoint.y < startPoint.y) {
                             if (endPoint.x < startPoint.x) {
@@ -496,6 +478,45 @@ class Tools {
                 }
                 context.stroke()
             }
+        }
+    }
+    static EraseTool = class extends Tools.PencilTool {
+        static name = "erasetool"
+        name = "erasetool"
+
+        static defaultColor = Color.White
+        // The tool's color will always be white
+        static set color(value) { }
+        static get color() { return this.defaultColor }
+    }
+    // static ColorTool = class extends Tools.Tool {
+    //     static name = "linetool"
+    //     name = "linetool"
+        
+    //     static defaultColor = Color.White
+
+    //     start(event, mobile) { }
+    //     stop(event, mobile) {
+    //         const rgb = context.getImageData(event.clientX, event.clientY, 1, 1).data
+    //         Tools.ColorTool.color = new Color(rgb[0], rgb[1], rgb[2])
+    //     }
+    //     update(event, mobile) {
+    //     }
+    // }
+    static fromName(name) {
+        switch(name) {
+            case "linetool":
+                return this.LineTool
+            case "penciltool":
+                return this.PencilTool
+            case "squaretool":
+                return this.SquareTool
+            case "circletool":
+                return this.CircleTool
+            case "erasetool":
+                return this.EraseTool
+            // case "colortool":
+            //     return this.ColorTool
         }
     }
     static defaultTool = Tools.PencilTool
