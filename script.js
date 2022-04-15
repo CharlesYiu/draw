@@ -22,9 +22,9 @@ window.onkeydown = function() {
     } else if (key === "c") {
         Tools.selected = Tools.CircleTool
         updateTool()
-    // } else if (key === "e") {
-    //     Tools.selected = Tools.EraseTool
-    //     updateTool()
+    } else if (key === "e") {
+        Tools.selected = Tools.EraseTool
+        updateTool()
     } else if (key === "=") {
         thicknessInput.valueAsNumber += 1
     } else if (key === "-") {
