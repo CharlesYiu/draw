@@ -9,6 +9,7 @@ window.onkeydown = function() {
         pressedShift = true
     } else if (key === "Escape") {
         settings.style.opacity = settings.style.opacity === "0.25" ? "1" : "0.25"
+        settings.style.pointerEvents = settings.style.opacity === "0.25" ? "none" : "auto"
         transparentSettings = settings.style.opacity === "0.25"
     } else if (key === "l") {
         Tools.selected = Tools.LineTool
@@ -41,9 +42,11 @@ window.onkeyup = function() {
 window.addEventListener("load", Tools.Handle)
 canvas.addEventListener("mousedown", function() {
     settings.style.opacity = "0.25"
+    settings.style.pointerEvents = "none"
 })
 canvas.addEventListener("mouseup", function() {
     if (!transparentSettings) {
         settings.style.opacity = "1"
+        settings.style.pointerEvents = "auto"
     }
 })

@@ -13,9 +13,9 @@
         <div id="cursor-dot"></div>
     </div>
     <div id="overlay">
-        <button id="showsettings" class="singlebutton" hidden>Show Settings</button>
+        <button id="showsettings" class="singlebutton" hidden>Show Panel</button>
         <div id="settings">
-            <button id="hidesettings" class="singlebutton">Hide Settings</button>
+            <button id="hidesettings" class="singlebutton">Hide Panel</button>
             <div id="settings-linecolor" class="subsettings">
                 <p id="settings-linecolor-header" class="subsettings-header">Color:</p>
                 <input type="range" id="settings-linecolor-avalue" class="sliderinput">
@@ -47,7 +47,9 @@
             <div id="settings-advanced" class="subsettings" hidden>
                 <p id="settings-advanced-header" class="subsettings-header">Settings:</p>
                 <button id="settings-advanced-cursor" class="singlebutton">Use Default Cursor</button>
+                <button id="settings-advanced-changerelease" class="singlebutton">Use latest release</button>
             </div>
+            <button id="settings-repo" class="singlebutton">Github</button>
         </div>
     </div>
     <script src="tools.js"></script>
