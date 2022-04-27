@@ -187,6 +187,18 @@ HoldAction(
     },
     document.getElementById("settings-undoredo-redo")
 )
+// Change release
+const changeRelease = document.getElementById("settings-advanced-changerelease")
+if (window.location.hostname === "charlesyiu.github.io") changeRelease.innerText = "Use stable release"
+changeRelease.onclick = function() {
+    if (window.location.hostname === "charlesyiu.github.io") window.location.replace("https://draw.pages.dev")
+    else window.location.replace("https://charlesyiu.github.io/draw-rewrite")
+}
+// Go to Github repo
+document.getElementById("settings-repo").onclick = function() {
+    if (window.location.hostname === "draw.pages.dev") open("https://github.com/charlesyiu/draw-rewrite/tree/stable")
+    else open("https://github.com/charlesyiu/draw-rewrite/tree/main")
+}
 // Clear canvas
 let clearCanvasPressed = false
 const clearCanvasButton = document.getElementById("settings-clear")
