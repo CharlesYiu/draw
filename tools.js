@@ -7,8 +7,13 @@ function resizeCanvas(context) {
     context.canvas.height = window.innerHeight
 }
 let elements = []
+function drawBackground(context, color = Color.White) {
+    context.fillStyle = color.rgba
+    context.fillRect(0, 0, context.canvas.width, context.canvas.height)
+}
 function redrawElements(context, elements) {
     clearCanvas(context)
+    drawBackground(context)
     elements.forEach(function(element) {
         element.draw(context)
     })
@@ -143,6 +148,7 @@ class Color {
         return color
     }
 }
+drawBackground(context)
 function randomId(prefix = "")
 {
     return Math.random().toString(36).replace('0.',prefix || '');
@@ -158,9 +164,9 @@ class Tools {
                     const pointerIndex = pointers.push({
                         tool: new Tools.selected(),
                         identifier: touch.identifier,
-                        event: event
+                        event: touch
                     }) - 1
-                    pointers[pointerIndex].tool.start(event, false)
+                    pointers[pointerIndex].tool.start(touch, false)
                 }
             }
         })
@@ -170,9 +176,10 @@ class Tools {
                 const touch = event.touches[index]
                 for(let index = 0; index < pointers.length; index++) {
                     const pointer = pointers[index]
-                    if (pointer.identifier === touch.identifier) {
+                    if (pointer.identifier == touch.identifier) {
                         pointer.event = touch
                         pointer.tool.update(touch, true)
+                        console.log(pointer)
                         break
                     }
                 }
@@ -215,7 +222,7 @@ class Tools {
                 return false
             })
         })
-        canvas.addEventListener("mouseup", function(event) {
+        function mouseDone(event) {
             mouseDown = false
             pointers.some(function(pointer) {
                 if (pointer.identifier == "mouse") {
@@ -225,7 +232,9 @@ class Tools {
                 }
                 return false
             })
-        })
+        }
+        canvas.addEventListener("mouseup", mouseDone)
+        canvas.addEventListener("mouseleave", mouseDone)
     }
     static Point = class {
         constructor(x, y) {
@@ -375,18 +384,25 @@ class Tools {
         name = "squaretool"
 
         update(event, mobile) {
-            let PressedShift = pressedShift
-            if (mobile) {
-                PressedShift = event.touches.length > 1
-            }
+            // let PressedShift = pressedShift
+            // if (mobile) {
+            //     PressedShift = event.touches.length > 1
+            // }
             event = Tools.Point.fromEvent(event, mobile)
             clearCanvas(this.previewContext)
+            console.log(this.tool)
             this.element = new this.tool.Element(
                 [this.startPoint, event],
                 this.tool.thickness,
                 this.tool.color,
-                PressedShift
+                pressedShift
             )
+            console.log(new this.tool.Element(
+                [this.startPoint, event],
+                this.tool.thickness,
+                this.tool.color,
+                pressedShift
+            ))
             this.element.draw(this.previewContext)
         }
         static Element = class {
@@ -403,6 +419,7 @@ class Tools {
                 context.strokeStyle = this.color.rgba
                 context.lineWidth = this.thickness
                 context.lineCap = "round"
+                context.lineJoin = "round"
                 if (this.square) {
                     const size = Math.abs(endPoint.x - startPoint.x)
                     if (endPoint.y < startPoint.y) {
@@ -439,6 +456,7 @@ class Tools {
                 context.strokeStyle = this.color.rgba
                 context.lineWidth = this.thickness
                 context.lineCap = "round"
+                context.lineJoin = "round"
                 if (this.equalWidth) {
                         const radius = Math.abs((endPoint.x - startPoint.x) / 2)
                         if (endPoint.y < startPoint.y) {

@@ -28,84 +28,56 @@ function HoldAction(action, element) {
     // element.ontouchstart = handle
     // element.onmousedown = handle
 }
-const settings = document.getElementById("settings")
-
+// Panel / settings stuff
+const panel = document.getElementById("panel")
+// Hide and show panel
+const showPanel = document.getElementById("showpanel")
+showPanel.onclick = function() {
+    panel.hidden = false
+    showPanel.hidden = true
+}
+document.getElementById("hidepanel").onclick = function() {
+    showPanel.hidden = false
+    panel.hidden = true
+}
 // Hide and show settings
-const showSettings = document.getElementById("showsettings")
+const settings = document.getElementById("panel-settings")
+const showSettings = document.getElementById("panel-showsettings")
 showSettings.onclick = function() {
-    settings.hidden = false
-    showSettings.hidden = true
-}
-const hideSettings = document.getElementById("hidesettings")
-hideSettings.onclick = function() {
-    showSettings.hidden = false
-    settings.hidden = true
-}
-
-// Hide and show advanced settings
-const advancedSettings = document.getElementById("settings-advanced")
-const showAdvanced = document.getElementById("settings-showadvanced")
-showAdvanced.onclick = function() {
-    advancedSettings.hidden = !advancedSettings.hidden
-    showAdvanced.textContent = advancedSettings.hidden ? "Show Settings" : "Hide Settings"
+    settings.hidden = !settings.hidden
+    showSettings.textContent = settings.hidden ? "Show Settings" : "Hide Settings"
 }
 // Tools
-const pencilTool = document.getElementById("settings-tools-penciltool")
-const lineTool = document.getElementById("settings-tools-linetool")
-const squareTool = document.getElementById("settings-tools-squaretool")
-const circleTool = document.getElementById("settings-tools-circletool")
-const eraseTool = document.getElementById("settings-tools-erasetool")
-const colorTool = document.getElementById("settings-tools-colortool")
-// let lastTool = null
-// function changeTool(name) {
-    // lastTool = Tools.selected
-//     const tool = Tools.fromName(name)
-//     Tools.selected = tool
-//     updateTool()
-// }
+const pencilTool = document.getElementById("panel-tools-penciltool")
+const lineTool = document.getElementById("panel-tools-linetool")
+const squareTool = document.getElementById("panel-tools-squaretool")
+const circleTool = document.getElementById("panel-tools-circletool")
+const eraseTool = document.getElementById("panel-tools-erasetool")
+const colorTool = document.getElementById("panel-tools-colortool")
 pencilTool.onclick = function() {
-    // if (Tools.selected === Tools.ColorTool) {
-    //     Tools.PencilTool.color = Tools.ColorTool.color
-    // }
-    // changeTool("penciltool")
     Tools.selected = Tools.PencilTool
     updateTool()
 }
 lineTool.onclick = function() {
-    // if (Tools.selected === Tools.ColorTool) {
-    //     Tools.LineTool.color = Tools.ColorTool.color
-    // }
-    // changeTool("linetool")
     Tools.selected = Tools.LineTool
     updateTool()
 }
 squareTool.onclick = function() {
-    // if (Tools.selected === Tools.ColorTool) {
-    //     Tools.SquareTool.color = Tools.ColorTool.color
-    // }
-    // changeTool("squaretool")
     Tools.selected = Tools.SquareTool
     updateTool()
 }
 circleTool.onclick = function() {
-    // if (Tools.selected === Tools.ColorTool) {
-    //     Tools.CircleTool.color = Tools.ColorTool.color
-    // }
-    // changeTool("circletool")
     Tools.selected = Tools.CircleTool
     updateTool()
 }
 eraseTool.onclick = function() {
-    // changeTool("erasetool")
     Tools.selected = Tools.EraseTool
     updateTool()
 }
-// colorTool.onclick = function() {
-//     changeTool("colortool")
-// }
-// Color
-const colorPicker = document.getElementById("settings-linecolor-value")
-const alphaSlider = document.getElementById("settings-linecolor-avalue")
+// Tool config
+// Color slider and picker
+const colorPicker = document.getElementById("panel-linecolor-value")
+const alphaSlider = document.getElementById("panel-linecolor-avalue")
 colorPicker.oninput = function() {
     // if (Tools.selected.name !== "erasetool" && Tools.selected.name !== "colortool") {
     if (Tools.selected.name !== "erasetool") {
@@ -122,15 +94,8 @@ alphaSlider.oninput = function() {
     const name = Tools.selected.name
     localStorage.setItem(name+"-alpha", alphaSlider.valueAsNumber.toString())
 }
-
-// Cursor
-const toggleCursor = document.getElementById("settings-advanced-cursor")
-toggleCursor.onclick = function() {
-    Cursor.use = !Cursor.use
-    localStorage.setItem("cursor", Cursor.use.toString())
-}
 // Thickness input
-const thicknessInput = document.getElementById("settings-linewidth-value")
+const thicknessInput = document.getElementById("panel-linewidth-value")
 thicknessInput.onblur = function() {
     if (thicknessInput.valueAsNumber > 250) {
         thicknessInput.valueAsNumber = 250
@@ -140,7 +105,6 @@ thicknessInput.onblur = function() {
     Tools.selected.thickness = thicknessInput.valueAsNumber
     localStorage.setItem(Tools.selected.name+"-thickness", thicknessInput.value)
 }
-
 // thickness buttons
 HoldAction(
     function() {
@@ -152,7 +116,7 @@ HoldAction(
         Tools.selected.thickness = thicknessInput.valueAsNumber
         localStorage.setItem(Tools.selected.name+"-thickness", thicknessInput.value)
     },
-    document.getElementById("settings-linewidth-add")
+    document.getElementById("panel-linewidth-add")
 )
 HoldAction(
     function() {
@@ -164,9 +128,33 @@ HoldAction(
         Tools.selected.thickness = thicknessInput.valueAsNumber
         localStorage.setItem(Tools.selected.name+"-thickness", thicknessInput.value)
     },
-    document.getElementById("settings-linewidth-minus")
+    document.getElementById("panel-linewidth-minus")
 )
-
+// Tool helper
+function updateTool() {
+    lineTool.classList.remove("highlighted")
+    pencilTool.classList.remove("highlighted")
+    squareTool.classList.remove("highlighted")
+    circleTool.classList.remove("highlighted")
+    eraseTool.classList.remove("highlighted")
+    if (Tools.selected === Tools.LineTool) {
+        lineTool.classList.add("highlighted")
+    } else if (Tools.selected === Tools.PencilTool) {
+        pencilTool.classList.add("highlighted")
+    } else if (Tools.selected === Tools.SquareTool) {
+        squareTool.classList.add("highlighted")
+    } else if (Tools.selected === Tools.CircleTool) {
+        circleTool.classList.add("highlighted")
+    } else if (Tools.selected === Tools.EraseTool) {
+        eraseTool.classList.add("highlighted")
+    }
+    localStorage.setItem("selected-tool", Tools.selected.name)
+    const color = Tools.selected.color
+    colorPicker.value = color.hex
+    alphaSlider.valueAsNumber = color.alpha * 100
+    thicknessInput.valueAsNumber = Tools.selected.thickness
+}
+// Canvas actions
 // Undo Redo
 removedElements = []
 HoldAction(
@@ -176,7 +164,7 @@ HoldAction(
             redrawElements(context, elements)
         }
     },
-    document.getElementById("settings-undoredo-undo")
+    document.getElementById("panel-undoredo-undo")
 )
 HoldAction(
     function() {
@@ -185,23 +173,20 @@ HoldAction(
             redrawElements(context, elements)
         }
     },
-    document.getElementById("settings-undoredo-redo")
+    document.getElementById("panel-undoredo-redo")
 )
-// Change release
-const changeRelease = document.getElementById("settings-advanced-changerelease")
-if (window.location.hostname === "charlesyiu.github.io") changeRelease.innerText = "Use stable release"
-changeRelease.onclick = function() {
-    if (window.location.hostname === "charlesyiu.github.io") window.location.replace("https://draw.pages.dev")
-    else window.location.replace("https://charlesyiu.github.io/draw-rewrite")
-}
-// Go to Github repo
-document.getElementById("settings-repo").onclick = function() {
-    if (window.location.hostname === "draw.pages.dev") open("https://github.com/charlesyiu/draw-rewrite/tree/stable")
-    else open("https://github.com/charlesyiu/draw-rewrite/tree/main")
+// Export canvas button
+document.getElementById("panel-export").onclick = function(event) {
+    const exportImageRedirect = document.createElement("a")
+    exportImageRedirect.href = canvas.toDataURL("image/jpeg")
+    exportImageRedirect.download = "drawing.jpeg"
+    exportImageRedirect.hidden = true
+    document.body.appendChild(exportImageRedirect)
+    exportImageRedirect.click()
 }
 // Clear canvas
 let clearCanvasPressed = false
-const clearCanvasButton = document.getElementById("settings-clear")
+const clearCanvasButton = document.getElementById("panel-clear")
 function resetClearCanvasButton() {
     clearCanvasButton.textContent = "Clear Canvas"
     clearCanvasButton.onclick = clearCanvasComfirm
@@ -221,29 +206,26 @@ function clearCanvasAction() {
 }
 clearCanvasButton.onclick = clearCanvasComfirm
 
-function updateTool() {
-    lineTool.classList.remove("highlighted")
-    pencilTool.classList.remove("highlighted")
-    squareTool.classList.remove("highlighted")
-    circleTool.classList.remove("highlighted")
-    eraseTool.classList.remove("highlighted")
-    if (Tools.selected === Tools.LineTool) {
-        lineTool.classList.add("highlighted")
-    } else if (Tools.selected === Tools.PencilTool) {
-        pencilTool.classList.add("highlighted")
-    } else if (Tools.selected === Tools.SquareTool) {
-        squareTool.classList.add("highlighted")
-    } else if (Tools.selected === Tools.CircleTool) {
-        circleTool.classList.add("highlighted")
-    } else if (Tools.selected === Tools.EraseTool) {
-        eraseTool.classList.add("highlighted")
-    }
-    const color = Tools.selected.color
-    colorPicker.value = color.hex
-    alphaSlider.valueAsNumber = color.alpha * 100
-    thicknessInput.valueAsNumber = Tools.selected.thickness
+// Other settings and buttons
+// Cursor
+const toggleCursor = document.getElementById("panel-settings-cursor")
+toggleCursor.onclick = function() {
+    Cursor.use = !Cursor.use
+    localStorage.setItem("cursor", Cursor.use.toString())
 }
-
+// Change release
+const changeRelease = document.getElementById("panel-settings-changerelease")
+if (window.location.hostname === "charlesyiu.github.io") changeRelease.innerText = "Use stable release"
+changeRelease.onclick = function() {
+    if (window.location.hostname === "charlesyiu.github.io") window.location.replace("https://draw.pages.dev")
+    else window.location.replace("https://charlesyiu.github.io/draw-rewrite")
+}
+// Go to Github repo
+document.getElementById("panel-repo").onclick = function() {
+    if (window.location.hostname === "draw.pages.dev") open("https://github.com/charlesyiu/draw-rewrite/tree/stable")
+    else open("https://github.com/charlesyiu/draw-rewrite/tree/main")
+}
+// Load settings
 function loadSettings() {
     const names = ["linetool", "penciltool", "squaretool", "circletool", "erasetool", "colortool"]
     names.forEach(function(name) {
@@ -258,6 +240,7 @@ function loadSettings() {
             tool.color = Color.fromHex(newHex)
         }
     })
+    if (selectedTool = localStorage.getItem("selected-tool")) Tools.selected = Tools.fromName(selectedTool)
     updateTool()
 
     Cursor.use = true

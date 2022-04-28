@@ -22,7 +22,7 @@ body, html {
 #canvas { background-color: white; }
 .previewCanvas { pointer-events: none; }
 /* Settings */
-#settings {
+#panel {
     position: fixed;
     background-color: rgb(218, 218, 218);
     text-align: center;
@@ -37,18 +37,18 @@ body, html {
     scrollbar-width: none;  /* Firefox */
     transition-duration: 0.25s
 }
-#settings::-webkit-scrollbar {
+#panel::-webkit-scrollbar {
     display: none;
 }
-.subsettings {
+.subpanel {
     background-color: rgba(0, 0, 0, 0.05);
     border-radius: 10px;
     padding: 10px;
     margin-top: 10px;
 }
-.subsettings-header { margin: 3.75px; }
+.subpanel-header { margin: 3.75px; }
 /* Buttons */
-#showsettings {
+#showpanel {
     position: fixed;
     left: 0;
     top: 0;
@@ -57,12 +57,12 @@ body, html {
     opacity: 50%;
     background-color: rgb(218, 218, 218);
 }
-#settings-clear, #settings-repo { margin-top: 10px; }
-#settings-linewidth-add, #settings-linewidth-minus { margin-top: -10px; }
-#settings-tools-linetool { margin-top: 2.5%; }
-#settings-linecolor { position: relative; }
-#settings-showadvanced, #settings-clear { margin-top: 10px; }
-#settings-tools-squaretool, #settings-tools-circletool, #settings-tools-erasetool, #settings-tools-colortool, #settings-advanced-changerelease {
+#panel-clear, #panel-repo, #panel-export { margin-top: 10px; }
+#panel-linewidth-add, #panel-linewidth-minus { margin-top: -10px; }
+#panel-tools-linetool { margin-top: 2.5%; }
+#panel-linecolor { position: relative; }
+#panel-showsettings, #panel-clear { margin-top: 10px; }
+#panel-tools-squaretool, #panel-tools-circletool, #panel-tools-erasetool, #panel-tools-colortool, #panel-settings-changerelease {
     margin-top: 5px;
 }
 /* Buttons in general */

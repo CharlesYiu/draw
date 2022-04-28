@@ -1,5 +1,11 @@
-// TODO Implement export as image button
 // TODO Implement save as project button
+// FIXME Preview layers are not removed sometimes (Requires more testing to find the cause)
+// FIXME delete 'let pressedShift...' and replace it with something better
+// FIXME rewrite/reorganize style.css
+// TODO Implement color picker
+// TODO Implement color bucket
+// TODO use a dictionary instead of an array in 'let pointers...' (Optional)
+// TODO Smooth pencil tool's lines (Not important)
 let pressedShift = false
 let transparentSettings = false
 
