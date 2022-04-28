@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, maximum-scale=1.0, initial-scale=1.0">
     <title>Draw Rewrite</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" href="https://charlesyiu.github.io/favicon.ico">
 </head>
 <body id="app">
     <canvas id="canvas" class="canvas"></canvas>
@@ -13,43 +14,43 @@
         <div id="cursor-dot"></div>
     </div>
     <div id="overlay">
-        <button id="showsettings" class="singlebutton" hidden>Show Panel</button>
-        <div id="settings">
-            <button id="hidesettings" class="singlebutton">Hide Panel</button>
-            <div id="settings-linecolor" class="subsettings">
-                <p id="settings-linecolor-header" class="subsettings-header">Color:</p>
-                <input type="range" id="settings-linecolor-avalue" class="sliderinput">
-                <div id="settings-linecolor-gridcolorpicker" class="gridcolorpickerinput"></div>
-                <input type="color" id="settings-linecolor-value" class="colorinput">
+        <button id="showpanel" class="singlebutton" hidden>Show Panel</button>
+        <div id="panel">
+            <button id="hidepanel" class="singlebutton">Hide Panel</button>
+            <div id="panel-linecolor" class="subpanel">
+                <p id="panel-linecolor-header" class="subpanel-header">Color:</p>
+                <input type="range" id="panel-linecolor-avalue" class="sliderinput">
+                <input type="color" id="panel-linecolor-value"class="colorinput">
             </div>
-            <div id="settings-linewidth" class="subsettings">
-                <p id="settings-linewidth-header" class="subsettings-header">Width:</p>
-                <input type="number" id="settings-linewidth-value" class="numberinput">
-                <button id="settings-linewidth-add" class="doublebuttons">+</button>
-                <button id="settings-linewidth-minus" class="doublebuttons">-</button>
+            <div id="panel-linewidth" class="subpanel">
+                <p id="panel-linewidth-header" class="subpanel-header">Width:</p>
+                <input type="number" id="panel-linewidth-value" class="numberinput">
+                <button id="panel-linewidth-add" class="doublebuttons">+</button>
+                <button id="panel-linewidth-minus" class="doublebuttons">-</button>
             </div>
-            <div id="settings-tools" class="subsettings">
-                <p id="settings-tools-header" class="subsettings-header">Tool:</p>
-                <button id="settings-tools-penciltool" class="doublebuttons highlighted">Pencil</button>
-                <button id="settings-tools-linetool" class="doublebuttons">Line</button>
-                <button id="settings-tools-squaretool" class="doublebuttons">Square</button>
-                <button id="settings-tools-circletool" class="doublebuttons">Circle</button>
-                <button id="settings-tools-erasetool" class="singlebutton">Eraser</button>
+            <div id="panel-tools" class="subpanel">
+                <p id="panel-tools-header" class="subpanel-header">Tool:</p>
+                <button id="panel-tools-penciltool" class="doublebuttons highlighted">Pencil</button>
+                <button id="panel-tools-linetool" class="doublebuttons">Line</button>
+                <button id="panel-tools-squaretool" class="doublebuttons">Square</button>
+                <button id="panel-tools-circletool" class="doublebuttons">Circle</button>
+                <button id="panel-tools-erasetool" class="singlebutton">Eraser</button>
                 <!-- <button id="settings-tools-colortool" class="doublebuttons">Color</button> -->
                 <!-- <button id="settings-tools-erasetool" class="doublebuttons">Eraser</button> -->
             </div>
-            <div id="settings-undoredo" class="subsettings">
-                <button id="settings-undoredo-undo" class="doublebuttons">Undo</button>
-                <button id="settings-undoredo-redo" class="doublebuttons">Redo</button>
+            <div id="panel-undoredo" class="subpanel">
+                <button id="panel-undoredo-undo" class="doublebuttons">Undo</button>
+                <button id="panel-undoredo-redo" class="doublebuttons">Redo</button>
             </div>
-            <button id="settings-clear" class="singlebutton">Clear Canvas</button>
-            <button id="settings-showadvanced" class="singlebutton">Show Settings</button>
-            <div id="settings-advanced" class="subsettings" hidden>
-                <p id="settings-advanced-header" class="subsettings-header">Settings:</p>
-                <button id="settings-advanced-cursor" class="singlebutton">Use Default Cursor</button>
-                <button id="settings-advanced-changerelease" class="singlebutton">Use latest release</button>
+            <button id="panel-clear" class="singlebutton">Clear Canvas</button>
+            <button id="panel-export" class="singlebutton">Export Drawing</button>
+            <button id="panel-showsettings" class="singlebutton">Show Settings</button>
+            <div id="panel-settings" class="subpanel" hidden>
+                <p id="panel-settings-header" class="subpanel-header">Settings:</p>
+                <button id="panel-settings-cursor" class="singlebutton">Use Default Cursor</button>
+                <button id="panel-settings-changerelease" class="singlebutton">Use latest release</button>
             </div>
-            <button id="settings-repo" class="singlebutton">Github</button>
+            <button id="panel-repo" class="singlebutton">Github</button>
         </div>
     </div>
     <script src="tools.js"></script>
