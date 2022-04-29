@@ -390,19 +390,12 @@ class Tools {
             // }
             event = Tools.Point.fromEvent(event, mobile)
             clearCanvas(this.previewContext)
-            console.log(this.tool)
             this.element = new this.tool.Element(
                 [this.startPoint, event],
                 this.tool.thickness,
                 this.tool.color,
                 pressedShift
             )
-            console.log(new this.tool.Element(
-                [this.startPoint, event],
-                this.tool.thickness,
-                this.tool.color,
-                pressedShift
-            ))
             this.element.draw(this.previewContext)
         }
         static Element = class {
@@ -420,7 +413,7 @@ class Tools {
                 context.lineWidth = this.thickness
                 context.lineCap = "round"
                 context.lineJoin = "round"
-                if (this.square) {
+                if (this.equalWidth) {
                     const size = Math.abs(endPoint.x - startPoint.x)
                     if (endPoint.y < startPoint.y) {
                         if (endPoint.x < startPoint.x) {
