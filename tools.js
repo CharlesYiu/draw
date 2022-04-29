@@ -410,7 +410,7 @@ class Tools {
                 this.points = points
                 this.thickness = thickness
                 this.color = color
-                this.equalWidth = this.equalWidth
+                this.equalWidth = equalWidth
             }
             draw(context) {
                 const startPoint = this.points[0]
