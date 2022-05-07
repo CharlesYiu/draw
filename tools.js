@@ -302,7 +302,7 @@ class Tools {
             this.element = new this.tool.Element(
                 [this.startPoint, event],
                 this.tool.thickness,
-                this.tool.color
+                this.tool.color.rgba
             )
             this.element.draw(this.previewContext)
         }
@@ -315,7 +315,7 @@ class Tools {
             draw(context) {
                 const startPoint = this.points[0]
                 context.beginPath()
-                context.strokeStyle = this.color.rgba
+                context.strokeStyle = this.color
                 context.lineWidth = this.thickness
                 context.lineCap = "round"
                 context.moveTo(startPoint.x, startPoint.y)
@@ -343,7 +343,7 @@ class Tools {
             this.element = new this.tool.Element(
                 [this.startPoint, this.startPoint],
                 this.tool.thickness,
-                this.tool.color
+                this.tool.color.rgba
             )
         }
         update(event, mobile) {
@@ -366,7 +366,7 @@ class Tools {
             draw(context) {
                 const startPoint = this.points[0]
                 context.beginPath()
-                context.strokeStyle = this.color.rgba
+                context.strokeStyle = this.color
                 context.lineWidth = this.thickness
                 context.lineCap = "round"
                 context.lineJoin = "round"
@@ -390,19 +390,12 @@ class Tools {
             // }
             event = Tools.Point.fromEvent(event, mobile)
             clearCanvas(this.previewContext)
-            console.log(this.tool)
             this.element = new this.tool.Element(
                 [this.startPoint, event],
                 this.tool.thickness,
-                this.tool.color,
+                this.tool.color.rgba,
                 pressedShift
             )
-            console.log(new this.tool.Element(
-                [this.startPoint, event],
-                this.tool.thickness,
-                this.tool.color,
-                pressedShift
-            ))
             this.element.draw(this.previewContext)
         }
         static Element = class {
@@ -416,7 +409,7 @@ class Tools {
                 const startPoint = this.points[0]
                 const endPoint = this.points[1]
                 context.beginPath()
-                context.strokeStyle = this.color.rgba
+                context.strokeStyle = this.color
                 context.lineWidth = this.thickness
                 context.lineCap = "round"
                 context.lineJoin = "round"
@@ -453,7 +446,7 @@ class Tools {
                 const startPoint = this.points[0]
                 const endPoint = this.points[1]
                 context.beginPath()
-                context.strokeStyle = this.color.rgba
+                context.strokeStyle = this.color
                 context.lineWidth = this.thickness
                 context.lineCap = "round"
                 context.lineJoin = "round"
