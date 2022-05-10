@@ -413,7 +413,7 @@ class Tools {
                 context.lineWidth = this.thickness
                 context.lineCap = "round"
                 context.lineJoin = "round"
-                if (this.square) {
+                if (this.equalWidth) {
                     const size = Math.abs(endPoint.x - startPoint.x)
                     if (endPoint.y < startPoint.y) {
                         if (endPoint.x < startPoint.x) {
